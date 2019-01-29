@@ -1,0 +1,6 @@
+Repository       || https://github.com/ai-game-lincoln-uni/ai-game
+Trello           || https://trello.com/b/Oery0Sek
+Python 3.7.2     || https://www.python.org/ftp/python/3.7.2/python-3.7.2-amd64.exe
+TensorFlow       || https://www.tensorflow.org/tutorials
+Learn Python     || https://www.codecademy.com/learn/learn-python-3
+Pytest           || https://docs.pytest.org/en/latest
