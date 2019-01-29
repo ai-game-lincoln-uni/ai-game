@@ -1,0 +1,4 @@
+making game UI -- Dan
+unit testing -- Ally
+AI development -- Alex S || Mark
+documentation -- ALL
