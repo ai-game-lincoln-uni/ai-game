@@ -1,0 +1,10 @@
+Data structures.
+
+class board: 
+  def getMoves()
+  def makeMove(move)
+  def evaulate(payer)
+  def currentPlayer()
+  def isGameOver()
+  
+ aI FOR GAMES
