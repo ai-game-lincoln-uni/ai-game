@@ -5,10 +5,6 @@ Purpose: Basic Connect 4 game for AI group project
 Author: Daniel Allen
 Date: 07/02/19
 """
-# Todo: Convert to pygame
-# Todo: Add logging
-# Todo: Unit testing hooks
-# Todo: Test different grid sizes (should already work but better to be sure)
 import numpy as np
 import pprint
 import logging
