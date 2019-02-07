@@ -13,9 +13,24 @@ import numpy as np
 import pprint
 import logging
 import coloredlogs
+import contextlib
+import math
+with contextlib.redirect_stdout(None):
+    import pygame
+
 
 ROW_COUNT = 6
 COLUMN_COUNT = 7
+
+
+pygame.init()
+width = (COLUMN_COUNT+2) * 100
+height = (ROW_COUNT + 1) * 100
+size = (width, height)
+radius = int(100/2 - 5)
+screen = pygame.display.set_mode(size)
+
+
 log = logging.getLogger(__name__)
 fieldStyle = dict(
     asctime=dict(color='green'),
@@ -39,6 +54,7 @@ coloredlogs.install(level='DEBUG',
                     datefmt='%H:%M:%S',
                     fmt='[%(levelname)s]%(asctime)s || %(message)s',
                     field_styles=fieldStyle, level_styles=levelStyle)
+
 
 def _create_playField(x=6, y=7):
     """
@@ -141,11 +157,25 @@ def renderer(playField):
     :param playField: The play field
     :return: None
     """
-    pprint.pprint(np.flip(playField, 0))
+    playField = np.flip(playField, 0)
     # todo: Implement pygame for true gui, rather than cmdline
 
+    for col in range(COLUMN_COUNT):
+        for row in range(ROW_COUNT):
+            pygame.draw.rect(screen, (0, 89, 179), ((col*100), (row*100)+100, 100, 100))
+    for col in range(COLUMN_COUNT):
+        for row in range(ROW_COUNT):
+            if playField[row][col] == 0:
+                pygame.draw.circle(screen, (0, 0, 0), ((col*100)+50, (row*100)+150), radius)
+            if playField[row][col] == 1:
+                pygame.draw.circle(screen, (206, 22, 48), ((col*100)+50, (row*100)+150), radius)
+            if playField[row][col] == 2:
+                pygame.draw.circle(screen, (255, 201, 23), ((col*100)+50, (row*100)+150), radius)
+    playField = np.flip(playField, 0)
 
-def _input(playField, turn):
+
+
+def _input(playField, turn, pos):
     """
     Gets the player's move and validate it
 
@@ -153,21 +183,11 @@ def _input(playField, turn):
     :param turn: the current turn
     :return: the column the player chose
     """
-    # P1 input
-    while True:
-        try:
-            if turn % 2 == 0:
-                col = int(input("Player 1 Make your move (0-6): ").strip())
-            # P2 input
-            else:  # todo: AI would go here
-                col = int(input("Player 2 Make your move (0-6): ").strip())
-            if _validate_move(playField, col):
-                return col
-            else:
-                print("Invalid move!")
-        except Exception as e:
-            log.error(e)
-            print("Invalid move!")
+    posx = pos[0]
+    col = int(math.floor(posx/100))
+    if col > COLUMN_COUNT-1:
+        return None
+    return col
 
 
 def _game_loop(playField):
@@ -180,16 +200,37 @@ def _game_loop(playField):
     log.info("Game Loop started")
     turn = 0
     while True:
-        col = _input(playField, turn)
-        row = _get_next_open_row(playField, col)
-        _drop_piece(playField, row, col, turn % 2 + 1)
-        if _winning_move(playField, turn % 2 + 1):
-            log.info("Win condition met for player {}".format(turn % 2 + 1))
-            renderer(playField)
-            print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
-            return
-        renderer(playField)
-        turn += 1
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                # Allow game to quit
+                pygame.display.quit()
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEMOTION:
+                pygame.draw.rect(screen, (0, 0, 0), (0, 0, width, 100))
+                posx = event.pos[0]
+                if posx < (COLUMN_COUNT * 100) -25 and posx > 25:
+                    if turn % 2 == 0:
+                        pygame.draw.circle(screen, (206, 22, 48), (posx, 50), int(radius))
+                    else:
+                        pygame.draw.circle(screen, (255, 201, 23), (posx, 50), int(radius))
+                    pygame.display.update()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # click = drop piece
+                col = _input(playField, turn, event.pos)
+                if col is not None:
+                    row = _get_next_open_row(playField, col)
+                    _drop_piece(playField, row, col, turn % 2 + 1)
+                    if _winning_move(playField, turn % 2 + 1):
+                        log.info("Win condition met for player {}".format(turn % 2 + 1))
+                        renderer(playField)
+                        print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
+                        pygame.display.update()
+                        return
+                    renderer(playField)
+                    pygame.display.update()
+                    turn += 1
 
 
 def start_game():
@@ -200,6 +241,10 @@ def start_game():
     """
     log.info("Initialising game...")
     playField = _create_playField(ROW_COUNT, COLUMN_COUNT)
+    log.info("Rendering playfield...")
+    renderer(playField)
+    pygame.display.update()
+    log.info("Ready!")
     _game_loop(playField)
 
 
