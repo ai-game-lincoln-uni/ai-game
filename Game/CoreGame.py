@@ -25,6 +25,9 @@ height = (ROW_COUNT + 1) * 100
 size = (width, height)
 radius = int(100/2 - 5)
 screen = pygame.display.set_mode(size)
+pygame.display.set_caption("Connect 4 AI Game")
+logo_image = pygame.image.load("unnamed.png")
+pygame.display.set_icon(logo_image)
 
 
 log = logging.getLogger(__name__)
