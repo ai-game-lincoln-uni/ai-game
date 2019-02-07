@@ -11,10 +11,34 @@ Date: 07/02/19
 # Todo: Test different grid sizes (should already work but better to be sure)
 import numpy as np
 import pprint
+import logging
+import coloredlogs
 
 ROW_COUNT = 6
 COLUMN_COUNT = 7
-
+log = logging.getLogger(__name__)
+fieldStyle = dict(
+    asctime=dict(color='green'),
+    hostname=dict(color='magenta'),
+    levelname=dict(color='white',),
+    programname=dict(color='cyan'),
+    name=dict(color='blue'))
+levelStyle = dict(
+    spam=dict(color='green', faint=True),
+    debug=dict(color='cyan'),
+    verbose=dict(color='blue'),
+    info=dict(),
+    notice=dict(color='magenta'),
+    warning=dict(color='yellow'),
+    success=dict(color='green', bold=True),
+    error=dict(color='red'),
+    critical=dict(color='red', bold=True))
+"""Mapping of log format names to default font styles."""
+coloredlogs.install(level='DEBUG',
+                    logger=log,
+                    datefmt='%H:%M:%S',
+                    fmt='[%(levelname)s]%(asctime)s || %(message)s',
+                    field_styles=fieldStyle, level_styles=levelStyle)
 
 def _create_playField(x=6, y=7):
     """
@@ -24,6 +48,7 @@ def _create_playField(x=6, y=7):
     :param y: int: Y axis Size
     :return: 2D int array
     """
+    log.debug("Generating playfield with dimensions [{}][{}]".format(x, y))
     playField = np.zeros((x, y))
     return playField
 
@@ -38,6 +63,7 @@ def _drop_piece(playField, row, col, player):
     :param player: The player making the move
     :return: None
     """
+    log.debug("P{}: Placing piece at [{}][{}]".format(player, row, col))
     playField[row][col] = player
 
 
@@ -47,9 +73,8 @@ def _validate_move(playField, col):
 
     :param playField: The play field
     :param col: The target column
-    :return: Boolean representing possible (true) or not (false)
+    :return: int representing if move possible
     """
-
     return playField[ROW_COUNT-1][col] == 0
 
 
@@ -63,6 +88,7 @@ def _get_next_open_row(playField, col):
     """
     for i in range(ROW_COUNT):
         if playField[i][col] == 0:
+            log.debug("Selected row {} for {}".format(i, col))
             return i
 
 
@@ -140,7 +166,7 @@ def _input(playField, turn):
             else:
                 print("Invalid move!")
         except Exception as e:
-            print("DEBUG MESSAGE:", e)
+            log.error(e)
             print("Invalid move!")
 
 
@@ -151,12 +177,14 @@ def _game_loop(playField):
     :param playField: the play field
     :return: 
     """
+    log.info("Game Loop started")
     turn = 0
     while True:
         col = _input(playField, turn)
         row = _get_next_open_row(playField, col)
         _drop_piece(playField, row, col, turn % 2 + 1)
         if _winning_move(playField, turn % 2 + 1):
+            log.info("Win condition met for player {}".format(turn % 2 + 1))
             renderer(playField)
             print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
             return
@@ -170,6 +198,7 @@ def start_game():
 
     :return: None
     """
+    log.info("Initialising game...")
     playField = _create_playField(ROW_COUNT, COLUMN_COUNT)
     _game_loop(playField)
 
