@@ -1,4 +1,4 @@
-#from __future__ import print_function
+from __future__ import print_function
 #import data !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #IMPORTANT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #maybe make a matrix of possible outcomes to import and learn from.
