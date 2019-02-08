@@ -1,3 +1,24 @@
+#from __future__ import print_function
+#import data !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#IMPORTANT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#maybe make a matrix of possible outcomes to import and learn from.
+#example?
+#  |
+#  |
+#  |
+#  |x
+#  |x
+#  |x 0
+#  |x 0          0
+#   _ _ _ _ _ _ _
+#reward X + 1 0 -1
+#from ? import input_data
+#? = input_data.read_data_sets("/tmp/data", one_hot=False)
+
+
+
+
+
 import tensorflow as tf
 
 #construction phase
