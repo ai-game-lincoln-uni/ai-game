@@ -111,7 +111,7 @@ weight3 = tf.Variable(tf.random_normal([n_hidden_2, n_classes])
 #                  |____|
                       
 #learn with graident descent                     
-optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate) 
+opt = tf.train.GradientDescentOptimizer(learning_rate=learning_rate) 
 opt_op = opt.minmize(error)
 opt_op.run() #initalize varaibles
                       
