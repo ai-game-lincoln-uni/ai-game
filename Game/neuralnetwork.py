@@ -29,7 +29,7 @@ Y = tf.placeholder(tf.float32, [None, n_classes])
 
 
 
-model = n_input * x + b
+model = n_input * X + Y
 error = tf.square(model - model)
 
 
