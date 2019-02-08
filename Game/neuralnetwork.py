@@ -51,7 +51,7 @@ Y = tf.placeholder(tf.float32, [None, n_classes])
 
 
 model = n_input * X + Y
-error = tf.square(model - model)
+error = tf.square(model - Y)
 
 
 #
