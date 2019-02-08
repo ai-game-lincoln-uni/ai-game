@@ -40,12 +40,12 @@ n_hidden_2 = 100
 #2 hidden layers, 356 neurons. 
 n_input = boardRow * boardHeight
 # n_input = 42
-n_classes = 42 #output & input must be equal for graph
+n_output = 42 #output & input must be equal for graph
 
 #input dataplace holders
 X = tf.placeholder(tf.float32, [None, n_input])
 #output dataplaceholder
-Y = tf.placeholder(tf.float32, [None, n_classes])
+Y = tf.placeholder(tf.float32, [None, n_output])
 
 
 
