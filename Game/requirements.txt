@@ -1,3 +1,6 @@
 numpy
 coloredlogs
 pygame
+
+TensorFlow 1.5
+Keras
