@@ -69,7 +69,7 @@ weight3 = tf.Variable(tf.random_normal([n_hidden_2, n_classes])
 
 #bias
 
-#                    output 
+#                    Y 
 #                  ______
 #                    |  
 #                    |  
