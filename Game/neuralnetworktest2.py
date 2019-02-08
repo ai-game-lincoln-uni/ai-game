@@ -3,14 +3,18 @@ import keras
 import numpy as np
 from keras.models import Sequential
 from keras.layer import dense
+numpy.random.seed(10)
 
-
-dataset = pd.read_csv('connect4.data')
+dataset = numpy.loadtxt('connect4.csv')
 
 
 #split data into x and y, values to be changed.
 X = dataset[:,0:10]
 Y = dataset[:,10] 
+
+#traindata
+xTrain, yTrain, xTest, yTest = train_test_split(X, Y, test_size=0.4)
+
 
 model = Sequential() #model for neural network
 model.add(Dense(4, input_dim=16, activation='rulu')) #input
