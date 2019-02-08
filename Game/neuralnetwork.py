@@ -30,9 +30,9 @@ boardHeight = 7
 learning_rate = 0.3
 
 #steps of training to rn
-#num_steps = 2000
+num_steps = 2000
 batch_size = 100
-num_steps = int(np.ceil(m / batch_size))
+#num_steps = int(np.ceil(m / batch_size))
 
 #network parameters.
 n_hidden_1 = 256
@@ -40,8 +40,7 @@ n_hidden_2 = 100
 #2 hidden layers, 356 neurons. 
 n_input = boardRow * boardHeight
 # n_input = 42
-n_classes = 100 #output but i don't know what the number should be. 
-
+n_classes = 42 #output & input must be equal for graph
 
 #input dataplace holders
 X = tf.placeholder(tf.float32, [None, n_input])
