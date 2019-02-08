@@ -1,25 +1,12 @@
 from __future__ import print_function
-#import data !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#IMPORTANT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#maybe make a matrix of possible outcomes to import and learn from.
-#example?
-#  |
-#  |
-#  |
-#  |x
-#  |x
-#  |x 0
-#  |x 0          0
-#   _ _ _ _ _ _ _
-#reward X + 1 0 -1
-#from ? import input_data
-#? = input_data.read_data_sets("/tmp/data", one_hot=False)
+
 
 
 
 
 
 import tensorflow as tf
+import numpy as np
 
 #construction phase
 boardRow = 6
@@ -32,7 +19,6 @@ learning_rate = 0.3
 #steps of training to rn
 num_steps = 2000
 batch_size = 100
-#num_steps = int(np.ceil(m / batch_size))
 
 #network parameters.
 n_hidden_1 = 256
@@ -40,7 +26,7 @@ n_hidden_2 = 100
 #2 hidden layers, 356 neurons. 
 n_input = boardRow * boardHeight
 # n_input = 42
-n_output = 42 #output & input must be equal for graph
+n_ouput = 42 #output & input must be equal for graph
 
 #input dataplace holders
 X = tf.placeholder(tf.float32, [None, n_input])
@@ -52,31 +38,13 @@ Y = tf.placeholder(tf.float32, [None, n_output])
 model = n_input * X + Y
 error = tf.square(model - Y)
 
+#learn with graident descent                     
+opt = tf.train.GradientDescentOptimizer(learning_rate=learning_rate) 
+opt_op = opt.minmize(error)
+opt_op.run() #initalize varaibles
+                      
 
-#
-#
-#
-#
-#
-#     GPU1                    GPU2
-#            _______                 ________
-#           |   X   |     |          |  Y   |
-#           |______|      |          | _____|
-#               |         |             |
-#               |         |             |
-#              42                     100
-#
-#
-#
-#
-#
-#
-
-#namescope loss
-
-
-
-
+  
 #weights don't work yet idk why
 
 #weight of hidden layer connect to input layer.
@@ -87,34 +55,8 @@ weight2 = tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2]))
 weight3 = tf.Variable(tf.random_normal([n_hidden_2, n_classes])
                       
 
-#bias
 
-#                    Y 
-#                  ______
-#                    |  
-#                    |  
-#                    |  
-#                    |  
-#                 ___|______ 
-#       Bias -----  |____|
-#      bias1         |
-#      bias2         |
-#      bias3         |
-#                    | 
-#                    |
-#     weights      __|___   
-#     weight1  --  |____|   
-#     weight2        |
-#     weight3        |
-#                  __|____
-#                  | X  |               
-#                  |____|
-                      
-#learn with graident descent                     
-opt = tf.train.GradientDescentOptimizer(learning_rate=learning_rate) 
-opt_op = opt.minmize(error)
-opt_op.run() #initalize varaibles
-                      
+
                       
 
                       
