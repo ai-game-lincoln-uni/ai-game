@@ -252,6 +252,9 @@ def _game_loop(playField):
                         renderer(playField)
                         print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
                         pygame.display.update()
+                        pygame.time.wait(2000)
+                        pygame.display.quit()
+                        pygame.quit()
                         return
                     renderer(playField)
                     pygame.display.update()
