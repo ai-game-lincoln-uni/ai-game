@@ -1,4 +1,3 @@
-#works if someone finds out how to fix the input size, I can't figure it out.
 #sources of information: https://keras.io/
 
 
@@ -10,13 +9,13 @@ from keras.layers import Dense, Dropout
 
 dataset = read_csv("connect4.csv", delimiter=",") #reads in file. http://archive.ics.uci.edu/ml/datasets/connect-4
 
-X = dataset.iloc[:,0:2].values #this bit I am having problems with!
-Y = dataset.iloc[:,1].values
-encoder = LabelEncoder()
-encoder.fit(X)
-encoded_X = encoder.transform(X)
-encoder.fit(Y)
-encoded_Y = encoder.transform(Y)
+X = dataset.iloc[:,0:42].values 
+Y = dataset.iloc[:,42:43].values
+#encoder = LabelEncoder()
+#encoder.fit(X)
+#encoded_X = encoder.transform(X)
+#encoder.fit(Y)
+#encoded_Y = encoder.transform(Y)
 
 x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 
