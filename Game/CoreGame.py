@@ -173,6 +173,15 @@ def renderer(playField):
                 pygame.draw.circle(screen, (255, 201, 23), ((col*100)+50, (row*100)+150), radius)
     playField = np.flip(playField, 0)
 
+def _quit(code=0):
+    """Cleanly closes the game"""
+    if code == 1:
+        log.critical("Game quiting with errors!")
+    else:
+        log.info("Game quiting...")
+    pygame.display.quit()
+    pygame.quit()
+    exit(code)
 
 
 def _input(playField, turn, pos):
@@ -193,15 +202,15 @@ def _input(playField, turn, pos):
         ### SANITY CHECKS ###
         if col is None:
             log.critical("AI returned Null value")
-            exit(1)  # exit with an error condition
+            _quit(1)  # exit with an error condition
         try:
             int(col)
         except ValueError:
             log.critical("AI didnt return an int")
-            exit(1)  # exit with an error condition
+            _quit(1)  # exit with an error condition
         if col > COLUMN_COUNT-1:
             log.critical("AI returned an impossible position")
-            exit(1)  # exit with an error condition
+            _quit(1)  # exit with an error condition
         else:
             # value from the AI should be known good now, it can be used safely
             return col
@@ -229,9 +238,7 @@ def _game_loop(playField):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 # Allow game to quit
-                pygame.display.quit()
-                pygame.quit()
-                exit()
+                _quit()
             if event.type == pygame.MOUSEMOTION:
                 pygame.draw.rect(screen, (0, 0, 0), (0, 0, width, 100))
                 posx = event.pos[0]
@@ -253,8 +260,7 @@ def _game_loop(playField):
                         print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
                         pygame.display.update()
                         pygame.time.wait(2000)
-                        pygame.display.quit()
-                        pygame.quit()
+                        quit()
                         return
                     renderer(playField)
                     pygame.display.update()
