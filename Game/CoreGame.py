@@ -18,6 +18,7 @@ with contextlib.redirect_stdout(None):
 ROW_COUNT = 6
 COLUMN_COUNT = 7
 
+AIMode = False
 
 pygame.init()
 width = (COLUMN_COUNT+2) * 100
@@ -182,11 +183,36 @@ def _input(playField, turn, pos):
     :param turn: the current turn
     :return: the column the player chose
     """
-    posx = pos[0]
-    col = int(math.floor(posx/100))
-    if col > COLUMN_COUNT-1:
-        return None
-    return col
+    # If AI is enabled, this if statement will call ai to give a column number
+    if turn % 2 == 0 and AIMode:
+        # todo: call some function that'll return a column number
+        col = 0 # todo: remove this line
+        return  # todo: remove this line and uncomment and edit the line below
+        col = ["some function to get a value off the AI"]
+
+        ### SANITY CHECKS ###
+        if col is None:
+            log.critical("AI returned Null value")
+            exit(1)  # exit with an error condition
+        try:
+            int(col)
+        except ValueError:
+            log.critical("AI didnt return an int")
+            exit(1)  # exit with an error condition
+        if col > COLUMN_COUNT-1:
+            log.critical("AI returned an impossible position")
+            exit(1)  # exit with an error condition
+        else:
+            # value from the AI should be known good now, it can be used safely
+            return col
+
+    else:
+        # if AIMode is not enabled, or its player 1, take input
+        posx = pos[0]
+        col = int(math.floor(posx/100))
+        if col > COLUMN_COUNT-1:
+            return None
+        return col
 
 
 def _game_loop(playField):
