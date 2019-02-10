@@ -17,7 +17,7 @@ le = preprocessing.LabelEncoder()
 X_encoded = le.fit_transform(X)
 
 ohe = OneHotEncoder(categorical_features=[0..42])
-X_onehot = le.fit_transform(X).toarray()
+X_onehot = ohe.fit_transform(X).toarray()
 
 x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 
