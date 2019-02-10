@@ -19,7 +19,6 @@ Y = dataset.iloc[:,42:43].values
 
 x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 
-#binary classification because it is a neural network, read keras documention for more knoweldge.
 model = Sequential()
 model.add(Dense(32, activation='relu', input_dim=100))
 model.add(Dropout(0.5))
@@ -28,7 +27,7 @@ model.add(Dropout(0.5))
 model.add(Dense(1, activation='sigmoid'))
 
 
-model.compile(optimizer='rmsprop', loss='binary_crossentropy',metrics=['accuracy'])
+model.compile(optimizer='rmsprop', loss='categorical_crossentropy',metrics=['accuracy'])
 
 model.fit(x_train, y_train, epochs=20,batch_size=128)
 
