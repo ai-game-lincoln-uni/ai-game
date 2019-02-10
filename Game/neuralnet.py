@@ -2,7 +2,7 @@
 
 
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.model_selection import train_test_split
 from pandas import read_csv
 from keras.models import Sequential
@@ -14,7 +14,10 @@ X = dataset.iloc[:,0:42].values
 Y = dataset.iloc[:,42:43].values
 
 le = preprocessing.LabelEncoder()
-X = le.fit_transform 
+X_encoded = le.fit_transform(X)
+
+ohe = OneHotEncoder(categorical_features=[0..42])
+X_onehot = le.fit_transform(X).toarray()
 
 x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 
