@@ -7,12 +7,11 @@ Date: 07/02/19
 """
 import numpy as np
 import pprint
-import logging
-import coloredlogs
 import contextlib
 import math
 with contextlib.redirect_stdout(None):
     import pygame
+from logManager import log
 
 
 ROW_COUNT = 6
@@ -31,29 +30,6 @@ logo_image = pygame.image.load("unnamed.png")
 pygame.display.set_icon(logo_image)
 
 
-log = logging.getLogger(__name__)
-fieldStyle = dict(
-    asctime=dict(color='green'),
-    hostname=dict(color='magenta'),
-    levelname=dict(color='white',),
-    programname=dict(color='cyan'),
-    name=dict(color='blue'))
-levelStyle = dict(
-    spam=dict(color='green', faint=True),
-    debug=dict(color='cyan'),
-    verbose=dict(color='blue'),
-    info=dict(),
-    notice=dict(color='magenta'),
-    warning=dict(color='yellow'),
-    success=dict(color='green', bold=True),
-    error=dict(color='red'),
-    critical=dict(color='red', bold=True))
-"""Mapping of log format names to default font styles."""
-coloredlogs.install(level='DEBUG',
-                    logger=log,
-                    datefmt='%H:%M:%S',
-                    fmt='[%(levelname)s]%(asctime)s || %(message)s',
-                    field_styles=fieldStyle, level_styles=levelStyle)
 
 
 def _create_playField(x=6, y=7):
