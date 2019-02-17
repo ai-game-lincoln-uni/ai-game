@@ -14,7 +14,7 @@
 - individual contributions - ALL
 - list of references - ALL
 - appendix I - lots of shit, check docs - Mark
-- Proof reading - Ally    And stitching all the parts together
+- Proof reading/Editor - Ally
 
 Our objective is to make an ai that can play connect 4 as well as or better than a human. ### increase to 400 words
 
