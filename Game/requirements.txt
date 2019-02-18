@@ -7,3 +7,5 @@ Keras
 pandas 
 scipy
 scikit-learn
+
+opencv-python
