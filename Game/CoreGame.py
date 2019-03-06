@@ -12,13 +12,14 @@ import math
 with contextlib.redirect_stdout(None):
     import pygame
 from logManager import log
+import os
 
 
 ROW_COUNT = 6
 COLUMN_COUNT = 7
 
 AIMode = False
-
+log.debug("AI mode set to {}".format(AIMode))
 pygame.init()
 width = (COLUMN_COUNT+2) * 100
 height = (ROW_COUNT + 1) * 100
@@ -29,7 +30,26 @@ pygame.display.set_caption("Connect 4 AI Game")
 logo_image = pygame.image.load("unnamed.png")
 pygame.display.set_icon(logo_image)
 
+def flattenAndExport(playfield):
+    dataForExport = []
+    for row in playfield:
+        for item in row:
+            dataForExport.append(item)
+    fileNum = 0
+    if not os.path.isdir("trainingData"):
+        log.debug("Training Data folder missing... creating")
+        os.mkdir("trainingData")
 
+    while True:
+        filename = "trainingData/ExportedState{}.txt".format(fileNum)
+        if os.path.isfile(filename):
+            fileNum += 1
+        else:
+            f = open(filename, "w")
+            f.write(str(dataForExport))
+            f.close()
+            log.info("Exported current state to {}".format(filename))
+            return
 
 
 def _create_playField(x=6, y=7):
@@ -134,7 +154,6 @@ def renderer(playField):
     :return: None
     """
     playField = np.flip(playField, 0)
-    # todo: Implement pygame for true gui, rather than cmdline
 
     for col in range(COLUMN_COUNT):
         for row in range(ROW_COUNT):
@@ -148,6 +167,7 @@ def renderer(playField):
             if playField[row][col] == 2:
                 pygame.draw.circle(screen, (255, 201, 23), ((col*100)+50, (row*100)+150), radius)
     playField = np.flip(playField, 0)
+
 
 def _quit(code=0):
     """Cleanly closes the game"""
@@ -170,6 +190,7 @@ def _input(playField, turn, pos):
     """
     # If AI is enabled, this if statement will call ai to give a column number
     if turn % 2 == 0 and AIMode:
+        log.debug("Polling AI code for its move...")
         # todo: call some function that'll return a column number
         col = 0 # todo: remove this line
         return  # todo: remove this line and uncomment and edit the line below
@@ -189,6 +210,7 @@ def _input(playField, turn, pos):
             _quit(1)  # exit with an error condition
         else:
             # value from the AI should be known good now, it can be used safely
+            log.debug("AI is putting its piece on column {}".format(col))
             return col
 
     else:
@@ -197,6 +219,7 @@ def _input(playField, turn, pos):
         col = int(math.floor(posx/100))
         if col > COLUMN_COUNT-1:
             return None
+        log.debug("Player clicked at {}|{} = column: {}".format(pos[0], pos[1], col))
         return col
 
 
@@ -210,7 +233,6 @@ def _game_loop(playField):
     log.info("Game Loop started")
     turn = 0
     while True:
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 # Allow game to quit
@@ -241,6 +263,10 @@ def _game_loop(playField):
                     renderer(playField)
                     pygame.display.update()
                     turn += 1
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_F6:
+                    log.debug("Exporting current game state...")
+                    flattenAndExport(playField)
 
 
 def start_game():
