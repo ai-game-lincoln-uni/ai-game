@@ -30,27 +30,41 @@ pygame.display.set_caption("Connect 4 AI Game")
 logo_image = pygame.image.load("unnamed.png")
 pygame.display.set_icon(logo_image)
 
+
 def flattenAndExport(playfield):
-    dataForExport = []
+    """
+    Flattens the 2D array into a 1D array and exports this data to a text file
+    :param playfield: The game's playfield
+    :return:
+    """
+    dataForExport = []  # Prepare a list for the data to be dumped into
     for row in playfield:
         for item in row:
-            dataForExport.append(item)
-    fileNum = 0
+            dataForExport.append(item)  # dump each item one by one into this new list
+
+    # EXPORTING CODE #
     if not os.path.isdir("trainingData"):
+        # Verify the desired folder exists, if not, create it
         log.debug("Training Data folder missing... creating")
         os.mkdir("trainingData")
 
-    while True:
-        filename = "trainingData/ExportedState{}.txt".format(fileNum)
-        if os.path.isfile(filename):
-            fileNum += 1
-        else:
-            f = open(filename, "w")
-            f.write(str(dataForExport))
-            f.close()
-            log.info("Exported current state to {}".format(filename))
-            return
-
+    fileNum = 0
+    try:
+        while True:
+            # this loop makes sure it wont overwrite an existing file, then writes
+            filename = "trainingData/ExportedState{}.txt".format(fileNum)
+            if os.path.isfile(filename):
+                fileNum += 1
+            else:
+                f = open(filename, "w")
+                f.write(str(dataForExport))
+                f.close()
+                log.info("Exported current state to {}".format(filename))
+                return True
+    except Exception as e:
+        # Error handling ^-^
+        log.error("Failed to export game state: {}".format(e))
+        return False
 
 def _create_playField(x=6, y=7):
     """
@@ -61,7 +75,7 @@ def _create_playField(x=6, y=7):
     :return: 2D int array
     """
     log.debug("Generating playfield with dimensions [{}][{}]".format(x, y))
-    playField = np.zeros((x, y))
+    playField = np.zeros((x, y)) # uses numpy to create a 2d array of pure zeros (im being lazy)
     return playField
 
 
@@ -85,8 +99,9 @@ def _validate_move(playField, col):
 
     :param playField: The play field
     :param col: The target column
-    :return: int representing if move possible
+    :return: bool representing if move possible
     """
+    # A one liner that returns an equality boolean
     return playField[ROW_COUNT-1][col] == 0
 
 
@@ -98,6 +113,7 @@ def _get_next_open_row(playField, col):
     :param col: The target column
     :return: int representing the row number
     """
+    # Iterates through the rows finding the first row where there is no existing piece
     for i in range(ROW_COUNT):
         if playField[i][col] == 0:
             log.debug("Selected row {} for {}".format(i, col))
@@ -153,24 +169,30 @@ def renderer(playField):
     :param playField: The play field
     :return: None
     """
-    playField = np.flip(playField, 0)
+    try:
+        playField = np.flip(playField, 0)
 
-    for col in range(COLUMN_COUNT):
-        for row in range(ROW_COUNT):
-            pygame.draw.rect(screen, (0, 89, 179), ((col*100), (row*100)+100, 100, 100))
-    for col in range(COLUMN_COUNT):
-        for row in range(ROW_COUNT):
-            if playField[row][col] == 0:
-                pygame.draw.circle(screen, (0, 0, 0), ((col*100)+50, (row*100)+150), radius)
-            if playField[row][col] == 1:
-                pygame.draw.circle(screen, (206, 22, 48), ((col*100)+50, (row*100)+150), radius)
-            if playField[row][col] == 2:
-                pygame.draw.circle(screen, (255, 201, 23), ((col*100)+50, (row*100)+150), radius)
-    playField = np.flip(playField, 0)
+        for col in range(COLUMN_COUNT):
+            for row in range(ROW_COUNT):
+                pygame.draw.rect(screen, (0, 89, 179), ((col*100), (row*100)+100, 100, 100))
+        for col in range(COLUMN_COUNT):
+            for row in range(ROW_COUNT):
+                if playField[row][col] == 0:
+                    pygame.draw.circle(screen, (0, 0, 0), ((col*100)+50, (row*100)+150), radius)
+                if playField[row][col] == 1:
+                    pygame.draw.circle(screen, (206, 22, 48), ((col*100)+50, (row*100)+150), radius)
+                if playField[row][col] == 2:
+                    pygame.draw.circle(screen, (255, 201, 23), ((col*100)+50, (row*100)+150), radius)
+        playField = np.flip(playField, 0)
+    except Exception as e:
+        log.critical("Renderer failed with error {}".format(e))
+        _quit(1)
 
 
 def _quit(code=0):
     """Cleanly closes the game"""
+    # In error codes, 0 = clean close, no errors
+    # 1 = closed with errors, very bad
     if code == 1:
         log.critical("Game quiting with errors!")
     else:
@@ -233,38 +255,41 @@ def _game_loop(playField):
     log.info("Game Loop started")
     turn = 0
     while True:
-        for event in pygame.event.get():
+        # BIG SCARY EVENT LOOP!
+        for event in pygame.event.get():  # poll pygame for events
             if event.type == pygame.QUIT:
                 # Allow game to quit
                 _quit()
             if event.type == pygame.MOUSEMOTION:
-                pygame.draw.rect(screen, (0, 0, 0), (0, 0, width, 100))
-                posx = event.pos[0]
-                if posx < (COLUMN_COUNT * 100) -25 and posx > 25:
-                    if turn % 2 == 0:
+                # User moved the mouse, so move their piece after their cursor for  A E S T H E T I C S
+                pygame.draw.rect(screen, (0, 0, 0), (0, 0, width, 100))  # hide the last frame of motion, turn this off for some really trippy stuff
+                posx = event.pos[0]  # get the location of the cursor
+                if posx < (COLUMN_COUNT * 100) -25 and posx > 25:  # messy way of clamping the location above the game columns
+                    if turn % 2 == 0:  # determine whos turn it is, and make the piece that colour
                         pygame.draw.circle(screen, (206, 22, 48), (posx, 50), int(radius))
                     else:
                         pygame.draw.circle(screen, (255, 201, 23), (posx, 50), int(radius))
-                    pygame.display.update()
+                    pygame.display.update()  # refresh the screen
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # click = drop piece
-                col = _input(playField, turn, event.pos)
-                if col is not None:
-                    row = _get_next_open_row(playField, col)
-                    _drop_piece(playField, row, col, turn % 2 + 1)
-                    if _winning_move(playField, turn % 2 + 1):
+                col = _input(playField, turn, event.pos)  # determine what column the user clicked above
+                if col is not None:  # None = the user didnt click in a valid location, so we ignore it
+                    row = _get_next_open_row(playField, col)  # determine what row we should place a piece
+                    _drop_piece(playField, row, col, turn % 2 + 1)  # drop said piece
+                    if _winning_move(playField, turn % 2 + 1):  # check if a player has won
                         log.info("Win condition met for player {}".format(turn % 2 + 1))
                         renderer(playField)
                         print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
                         pygame.display.update()
-                        pygame.time.wait(2000)
-                        quit()
-                        return
+                        pygame.time.wait(2000)  # wait for a bit to allow the player to  B A S K  in their glory                       quit()
+                        return  # exit the game loop and quit
                     renderer(playField)
                     pygame.display.update()
                     turn += 1
             if event.type == pygame.KEYDOWN:
+                # Bit of code for Mark, because he asked for the game to export its current state
                 if event.key == pygame.K_F6:
+                    # Check if the user pressed F6 then export
                     log.debug("Exporting current game state...")
                     flattenAndExport(playField)
 
@@ -276,13 +301,14 @@ def start_game():
     :return: None
     """
     log.info("Initialising game...")
-    playField = _create_playField(ROW_COUNT, COLUMN_COUNT)
+    playField = _create_playField(ROW_COUNT, COLUMN_COUNT)  # Creates a playfield of size designated at the top of this file
     log.info("Rendering playfield...")
-    renderer(playField)
-    pygame.display.update()
+    renderer(playField)  # Draw the User Interface
+    pygame.display.update()  # Refresh the screen so drawing can be seen
     log.info("Ready!")
-    _game_loop(playField)
+    _game_loop(playField)  # Start the game loop
 
 
 if __name__ == "__main__":
+    #  If the game is running itself (ie: someone didnt type ``import coreGame```), start the game
     start_game()
