@@ -13,6 +13,8 @@ with contextlib.redirect_stdout(None):
     import pygame
 from logManager import log
 import os
+import keras
+import random
 
 
 ROW_COUNT = 6
@@ -20,6 +22,9 @@ COLUMN_COUNT = 7
 
 AIMode = False
 log.debug("AI mode set to {}".format(AIMode))
+DataGatherMode = True
+GatherMove = False
+log.debug("Data Gather mode set to {}".format(DataGatherMode))
 pygame.init()
 width = (COLUMN_COUNT+2) * 100
 height = (ROW_COUNT + 1) * 100
@@ -30,6 +35,8 @@ pygame.display.set_caption("Connect 4 AI Game")
 logo_image = pygame.image.load("unnamed.png")
 pygame.display.set_icon(logo_image)
 
+#AI = keras.models.load_model('AI.model')    #Loads the NN model as made and saved in basicNeuralNet.py
+
 
 def flattenAndExport(playfield):
     """
@@ -37,6 +44,9 @@ def flattenAndExport(playfield):
     :param playfield: The game's playfield
     :return:
     """
+
+    GatherMove = True
+
     dataForExport = []  # Prepare a list for the data to be dumped into
     for row in playfield:
         for item in row:
@@ -66,6 +76,77 @@ def flattenAndExport(playfield):
         log.error("Failed to export game state: {}".format(e))
         return False
 
+
+def exportPlay(column):
+	"""
+    Converts play to an array and exports this data to a text file
+    :param playfield: The players move
+    :return:
+    """
+
+	GatherMove = False
+
+	dataForExport = []  # Prepare a list for the data to be dumped into
+    
+			
+	#Intended AI output would be list of probabilities indicating best move
+	#e.g: [0.1, 0.3, 0.5, 0.7, 0.5, 0.2, 0.1]
+	#Would indicate best move to be 4th column
+	
+	for i in range (0, 7):
+		if column == i: dataForExport.append(1.0)    #For move at col 2 would result in [0,0,1,0,0,0,0]
+		else: dataForExport.append(0.0)
+
+    # EXPORTING CODE #
+    if not os.path.isdir("trainingData"):
+        # Verify the desired folder exists, if not, create it
+        log.debug("Training Data folder missing... creating")
+        os.mkdir("trainingData")
+
+    fileNum = 0
+    try:
+        while True:
+            # this loop makes sure it wont overwrite an existing file, then writes
+            filename = "trainingData/ExportedMove{}.txt".format(fileNum)
+            if os.path.isfile(filename):
+                fileNum += 1
+            else:
+                f = open(filename, "w")
+                f.write(str(dataForExport))
+                f.close()
+                log.info("Exported current state to {}".format(filename))
+                return True
+    except Exception as e:
+        # Error handling ^-^
+        log.error("Failed to export game state: {}".format(e))
+        return False
+
+
+def _flatten_field(playfield):
+    field_array = []
+
+    for row in playfield:
+        for item in row:
+                field_array.append(item)
+
+    return field_array
+
+
+def _get_AI_move(playfield):
+
+    field = _flatten_field(playfield)
+    moves = AI.predict(field)    #Should return array eg: [0.1, 0.1, 0.3, 0.8, 0.4, 0.2, 0.1]
+
+    best_move = np.argmax(moves)    #Returns location of highest val, only first occurrence
+
+    while not _validate_move(best_move):
+        moves[best_move] = 0
+        best_move = np.argmax(moves)
+
+    log.info("AI selected move at {}".format(best_move))
+    return best_move
+
+		
 def _create_playField(x=6, y=7):
     """
     Creates a 2D matrix of zeros. Default size is 6X7
@@ -91,6 +172,9 @@ def _drop_piece(playField, row, col, player):
     """
     log.debug("P{}: Placing piece at [{}][{}]".format(player, row, col))
     playField[row][col] = player
+	
+    if player == 1 and DataGatherMode and GatherMove:
+		exportPlay(col)
 
 
 def _validate_move(playField, col):
@@ -213,10 +297,13 @@ def _input(playField, turn, pos):
     # If AI is enabled, this if statement will call ai to give a column number
     if turn % 2 == 0 and AIMode:
         log.debug("Polling AI code for its move...")
+        col = _get_AI_move(playField)
+        """
         # todo: call some function that'll return a column number
         col = 0 # todo: remove this line
         return  # todo: remove this line and uncomment and edit the line below
         col = ["some function to get a value off the AI"]
+        """
 
         ### SANITY CHECKS ###
         if col is None:
@@ -237,11 +324,14 @@ def _input(playField, turn, pos):
 
     else:
         # if AIMode is not enabled, or its player 1, take input
-        posx = pos[0]
-        col = int(math.floor(posx/100))
-        if col > COLUMN_COUNT-1:
-            return None
-        log.debug("Player clicked at {}|{} = column: {}".format(pos[0], pos[1], col))
+        if turn%2 == 1 and DataGatherMode:
+            col = random.sample([0,1,2,3,4,5,6], 1)
+        else:
+            posx = pos[0]
+            col = int(math.floor(posx/100))
+            if col > COLUMN_COUNT-1:
+                return None
+            log.debug("Player clicked at {}|{} = column: {}".format(pos[0], pos[1], col))
         return col
 
 
