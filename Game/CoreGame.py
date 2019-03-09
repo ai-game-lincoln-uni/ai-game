@@ -206,6 +206,7 @@ def _get_next_open_row(playField, col):
         if playField[i][col] == 0:
             log.debug("Selected row {} for {}".format(i, col))
             return i
+    return -1
 
 
 def _winning_move(playField, player):
@@ -369,14 +370,19 @@ def _game_loop(playField):
                 col = _input(playField, turn, event.pos)  # determine what column the user clicked above
                 if col is not None:  # None = the user didnt click in a valid location, so we ignore it
                     row = _get_next_open_row(playField, col)  # determine what row we should place a piece
-                    _drop_piece(playField, row, col, turn % 2 + 1)  # drop said piece
-                    if _winning_move(playField, turn % 2 + 1):  # check if a player has won
-                        log.info("Win condition met for player {}".format(turn % 2 + 1))
-                        renderer(playField)
-                        print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
-                        pygame.display.update()
-                        pygame.time.wait(2000)  # wait for a bit to allow the player to  B A S K  in their glory                       quit()
-                        return  # exit the game loop and quit
+                    if row != -1:
+                        _drop_piece(playField, row, col, turn % 2 + 1)  # drop said piece
+
+                        if _winning_move(playField, turn % 2 + 1):  # check if a player has won
+                            log.info("Win condition met for player {}".format(turn % 2 + 1))
+                            renderer(playField)
+                            print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
+                            pygame.display.update()
+                            pygame.time.wait(2000)  # wait for a bit to allow the player to  B A S K  in their glory                       quit()
+                            return  # exit the game loop and quit
+                    else:
+                        log.info("Unable to place piece on column " + str(col))
+                        turn -= 1
                     renderer(playField)
                     pygame.display.update()
                     turn += 1
