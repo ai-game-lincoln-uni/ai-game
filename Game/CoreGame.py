@@ -35,7 +35,8 @@ pygame.display.set_caption("Connect 4 AI Game")
 logo_image = pygame.image.load("unnamed.png")
 pygame.display.set_icon(logo_image)
 
-#AI = keras.models.load_model('AI.model')    #Loads the NN model as made and saved in basicNeuralNet.py
+if AIMode:
+    AI = keras.models.load_model('AI.model')    #Loads the NN model as made and saved in basicNeuralNet.py
 
 
 def flattenAndExport(playfield):
@@ -78,30 +79,33 @@ def flattenAndExport(playfield):
 
 
 def exportPlay(column):
-	"""
+    """
     Converts play to an array and exports this data to a text file
-    :param playfield: The players move
+    :param column: The players move
     :return:
     """
 
-	GatherMove = False
+    GatherMove = False
 
-	dataForExport = []  # Prepare a list for the data to be dumped into
-    
-			
-	#Intended AI output would be list of probabilities indicating best move
-	#e.g: [0.1, 0.3, 0.5, 0.7, 0.5, 0.2, 0.1]
-	#Would indicate best move to be 4th column
-	
-	for i in range (0, 7):
-		if column == i: dataForExport.append(1.0)    #For move at col 2 would result in [0,0,1,0,0,0,0]
-		else: dataForExport.append(0.0)
+    dataForExport = []  # Prepare a list for the data to be dumped into
+
+
+    """
+    #Intended AI output would be list of probabilities indicating best move
+    #e.g: [0.1, 0.3, 0.5, 0.7, 0.5, 0.2, 0.1]
+    #Would indicate best move to be 4th column
+    """
+
+    for i in range (0, 7):
+        if column == i: dataForExport.append(1.0)    #For move at col 2 would result in [0,0,1,0,0,0,0]
+        else: dataForExport.append(0.0)
 
     # EXPORTING CODE #
     if not os.path.isdir("trainingData"):
         # Verify the desired folder exists, if not, create it
         log.debug("Training Data folder missing... creating")
         os.mkdir("trainingData")
+
 
     fileNum = 0
     try:
@@ -146,7 +150,7 @@ def _get_AI_move(playfield):
     log.info("AI selected move at {}".format(best_move))
     return best_move
 
-		
+
 def _create_playField(x=6, y=7):
     """
     Creates a 2D matrix of zeros. Default size is 6X7
@@ -172,9 +176,9 @@ def _drop_piece(playField, row, col, player):
     """
     log.debug("P{}: Placing piece at [{}][{}]".format(player, row, col))
     playField[row][col] = player
-	
+
     if player == 1 and DataGatherMode and GatherMove:
-		exportPlay(col)
+        exportPlay(col)
 
 
 def _validate_move(playField, col):
