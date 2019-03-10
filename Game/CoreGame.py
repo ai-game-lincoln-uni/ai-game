@@ -20,11 +20,15 @@ import random
 ROW_COUNT = 6
 COLUMN_COUNT = 7
 
+
 AIMode = False
-log.debug("AI mode set to {}".format(AIMode))
-DataGatherMode = True
+DataGatherMode = False
 GatherMove = False
+TestMode = False
+
+log.debug("AI mode set to {}".format(AIMode))
 log.debug("Data Gather mode set to {}".format(DataGatherMode))
+log.debug("Test Mode set to {}".format(TestMode))
 pygame.init()
 width = (COLUMN_COUNT+2) * 100
 height = (ROW_COUNT + 1) * 100
@@ -302,6 +306,8 @@ def _input(playField, turn, pos):
     :return: the column the player chose
     """
     # If AI is enabled, this if statement will call ai to give a column number
+    if TestMode:
+        return random.randint(0, ROW_COUNT)
     if turn % 2 == 0 and AIMode:
         log.debug("Polling AI code for its move...")
         col = _get_AI_move(playField)
@@ -352,6 +358,9 @@ def _game_loop(playField):
     :param playField: the play field
     :return: 
     """
+    global TestMode
+    global DataGatherMode
+
     log.info("Game Loop started")
     turn = 0
     while True:
@@ -360,43 +369,81 @@ def _game_loop(playField):
             if event.type == pygame.QUIT:
                 # Allow game to quit
                 _quit()
-            if event.type == pygame.MOUSEMOTION:
-                # User moved the mouse, so move their piece after their cursor for  A E S T H E T I C S
-                pygame.draw.rect(screen, (0, 0, 0), (0, 0, width, 100))  # hide the last frame of motion, turn this off for some really trippy stuff
-                posx = event.pos[0]  # get the location of the cursor
-                if posx < (COLUMN_COUNT * 100) -25 and posx > 25:  # messy way of clamping the location above the game columns
-                    if turn % 2 == 0:  # determine whos turn it is, and make the piece that colour
-                        pygame.draw.circle(screen, (206, 22, 48), (posx, 50), int(radius))
-                    else:
-                        pygame.draw.circle(screen, (255, 201, 23), (posx, 50), int(radius))
-                    pygame.display.update()  # refresh the screen
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                # click = drop piece
-                col = _input(playField, turn, event.pos)  # determine what column the user clicked above
-                if col is not None:  # None = the user didnt click in a valid location, so we ignore it
-                    row = _get_next_open_row(playField, col)  # determine what row we should place a piece
-                    if row != -1:
-                        _drop_piece(playField, row, col, turn % 2 + 1)  # drop said piece
+            if not TestMode:
+                if event.type == pygame.MOUSEMOTION:
+                    # User moved the mouse, so move their piece after their cursor for  A E S T H E T I C S
+                    pygame.draw.rect(screen, (0, 0, 0), (
+                    0, 0, width, 100))  # hide the last frame of motion, turn this off for some really trippy stuff
+                    posx = event.pos[0]  # get the location of the cursor
+                    if posx < (COLUMN_COUNT * 100) - 25 and posx > 25:  # messy way of clamping the location above the game columns
+                        if turn % 2 == 0:  # determine whos turn it is, and make the piece that colour
+                            pygame.draw.circle(screen, (206, 22, 48), (posx, 50), int(radius))
+                        else:
+                            pygame.draw.circle(screen, (255, 201, 23), (posx, 50), int(radius))
+                        pygame.display.update()  # refresh the screen
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    # click = drop piece
+                    col = _input(playField, turn, event.pos)  # determine what column the user clicked above
+                    if col is not None:  # None = the user didnt click in a valid location, so we ignore it
+                        row = _get_next_open_row(playField, col)  # determine what row we should place a piece
+                        if row != -1:
+                            _drop_piece(playField, row, col, turn % 2 + 1)  # drop said piece
 
-                        if _winning_move(playField, turn % 2 + 1):  # check if a player has won
-                            log.info("Win condition met for player {}".format(turn % 2 + 1))
-                            renderer(playField)
-                            print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
-                            pygame.display.update()
-                            pygame.time.wait(2000)  # wait for a bit to allow the player to  B A S K  in their glory                       quit()
-                            return  # exit the game loop and quit
-                    else:
-                        log.info("Unable to place piece on column " + str(col))
-                        turn -= 1
-                    renderer(playField)
-                    pygame.display.update()
-                    turn += 1
+                            if _winning_move(playField, turn % 2 + 1):  # check if a player has won
+                                log.info("Win condition met for player {}".format(turn % 2 + 1))
+                                renderer(playField)
+                                print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
+                                if not TestMode:
+                                    pygame.display.update()
+                                    pygame.time.wait(2000)  # wait for a bit to allow the player to  B A S K  in their glory                       quit()
+                                    return  # exit the game loop and quit
+                                return
+                        else:
+                            log.info("Unable to place piece on column " + str(col))
+                            turn -= 1
+                        renderer(playField)
+                        pygame.display.update()
+                        turn += 1
+
             if event.type == pygame.KEYDOWN:
                 # Bit of code for Mark, because he asked for the game to export its current state
                 if event.key == pygame.K_F6 and turn%2==1:
                     # Check if the user pressed F6 then export
                     log.debug("Exporting current game state...")
                     flattenAndExport(playField)
+                if event.key == pygame.K_t:
+                    TestMode= not TestMode
+                    log.debug("Test Mode set to {}".format(TestMode))
+                if event.key == pygame.K_d:
+                    DataGatherMode = not DataGatherMode
+                    log.debug("Data Gather mode set to {}".format(DataGatherMode))
+
+        if TestMode:
+            col = _input(playField, turn, 1)
+            if col is not None:  # None = the user didnt click in a valid location, so we ignore it
+                row = _get_next_open_row(playField, col)  # determine what row we should place a piece
+                if row != -1:
+                    _drop_piece(playField, row, col, turn % 2 + 1)  # drop said piece
+                    renderer(playField)
+                    if _winning_move(playField, turn % 2 + 1):  # check if a player has won
+                        log.info("Win condition met for player {}".format(turn % 2 + 1))
+                        renderer(playField)
+                        pygame.display.update()
+                        print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
+                        pygame.time.wait(10)
+                        return
+                    pygame.display.update()
+                    turn += 1
+        unique, counts = np.unique(playField, return_counts=True)
+        dictionary = dict(zip(unique, counts))
+        try:
+            if  dictionary[0] == 0:
+                return
+        except KeyError:
+            log.warning("Playfield full, restarting...")
+            return
+        except ValueError:
+            pass
 
 
 def start_game():
@@ -417,3 +464,5 @@ def start_game():
 if __name__ == "__main__":
     #  If the game is running itself (ie: someone didnt type ``import coreGame```), start the game
     start_game()
+    while TestMode:
+        start_game()
