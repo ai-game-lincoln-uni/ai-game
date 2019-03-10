@@ -66,3 +66,10 @@ Game/.idea/httpRequests
 Game/.idea/caches/build_file_checksums.ser
 *.model
 *.log
+
+Game/.idea/
+Game/__pycache__/
+Game/venv/
+Game/venv/
+Game/trainingData/
+
