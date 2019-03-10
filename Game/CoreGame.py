@@ -328,8 +328,10 @@ def _input(playField, turn, pos):
 
     else:
         # if AIMode is not enabled, or its player 1, take input
-        if turn%2 == 1 and DataGatherMode:
+        if turn%2 == 0 and DataGatherMode:
             col = random.sample([0,1,2,3,4,5,6], 1)
+            #while not _validate_move(playfield, col):   # todo: <-- why not work?
+            #    col = random.smaple([0,1,2,3,4,5,6], 1)
         else:
             posx = pos[0]
             col = int(math.floor(posx/100))
