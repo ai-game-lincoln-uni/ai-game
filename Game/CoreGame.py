@@ -269,7 +269,10 @@ def renderer(playField):
 
         for col in range(COLUMN_COUNT):
             for row in range(ROW_COUNT):
-                pygame.draw.rect(screen, (0, 89, 179), ((col*100), (row*100)+100, 100, 100))
+                if not TestMode:
+                    pygame.draw.rect(screen, (0, 89, 179), ((col*100), (row*100)+100, 100, 100))
+                else:
+                    pygame.draw.rect(screen, (210, 0, 252), ((col * 100), (row * 100) + 100, 100, 100))
         for col in range(COLUMN_COUNT):
             for row in range(ROW_COUNT):
                 if playField[row][col] == 0:
@@ -413,6 +416,8 @@ def _game_loop(playField):
                     flattenAndExport(playField)
                 if event.key == pygame.K_t:
                     TestMode= not TestMode
+                    renderer(playField)
+                    pygame.display.flip()
                     log.debug("Test Mode set to {}".format(TestMode))
                 if event.key == pygame.K_d:
                     DataGatherMode = not DataGatherMode
