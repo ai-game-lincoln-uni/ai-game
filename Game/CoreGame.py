@@ -424,7 +424,6 @@ def _game_loop(playField):
                 row = _get_next_open_row(playField, col)  # determine what row we should place a piece
                 if row != -1:
                     _drop_piece(playField, row, col, turn % 2 + 1)  # drop said piece
-                    renderer(playField)
                     if _winning_move(playField, turn % 2 + 1):  # check if a player has won
                         log.info("Win condition met for player {}".format(turn % 2 + 1))
                         renderer(playField)
@@ -432,7 +431,6 @@ def _game_loop(playField):
                         print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
                         pygame.time.wait(10)
                         return
-                    pygame.display.update()
                     turn += 1
         unique, counts = np.unique(playField, return_counts=True)
         dictionary = dict(zip(unique, counts))
@@ -441,6 +439,8 @@ def _game_loop(playField):
                 return
         except KeyError:
             log.warning("Playfield full, restarting...")
+            renderer(playField)
+            pygame.display.update()
             return
         except ValueError:
             pass
@@ -455,8 +455,9 @@ def start_game():
     log.info("Initialising game...")
     playField = _create_playField(ROW_COUNT, COLUMN_COUNT)  # Creates a playfield of size designated at the top of this file
     log.info("Rendering playfield...")
-    renderer(playField)  # Draw the User Interface
-    pygame.display.update()  # Refresh the screen so drawing can be seen
+    if not TestMode:
+        renderer(playField)  # Draw the User Interface
+        pygame.display.update()  # Refresh the screen so drawing can be seen
     log.info("Ready!")
     _game_loop(playField)  # Start the game loop
 
