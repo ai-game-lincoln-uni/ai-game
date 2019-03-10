@@ -46,7 +46,7 @@ def flattenAndExport(playfield):
     :return:
     """
 
-    GatherMove = True
+    GatherMove = True    # The play made at this point to be recorded, for AI target data
 
     dataForExport = []  # Prepare a list for the data to be dumped into
     for row in playfield:
@@ -78,14 +78,14 @@ def flattenAndExport(playfield):
         return False
 
 
-def exportPlay(column):
+def exportPlay(column):    #todo: Why this isn't being called?
     """
     Converts play to an array and exports this data to a text file
     :param column: The players move
     :return:
     """
 
-    GatherMove = False
+    GatherMove = False    # Ensures that only plays after exported boards are recorded
 
     dataForExport = []  # Prepare a list for the data to be dumped into
 
@@ -96,9 +96,11 @@ def exportPlay(column):
     #Would indicate best move to be 4th column
     """
 
-    for i in range (0, 7):
-        if column == i: dataForExport.append(1.0)    #For move at col 2 would result in [0,0,1,0,0,0,0]
-        else: dataForExport.append(0.0)
+    for i in range(0, 7):
+        if column == i:
+            dataForExport.append(1.0)    #For move at col 2 would result in [0,0,1,0,0,0,0]
+        else:
+            dataForExport.append(0.0)
 
     # EXPORTING CODE #
     if not os.path.isdir("trainingData"):
@@ -126,25 +128,25 @@ def exportPlay(column):
         return False
 
 
-def _flatten_field(playfield):
+def _flatten_field(playField):
     field_array = []
 
-    for row in playfield:
+    for row in playField:
         for item in row:
                 field_array.append(item)
 
     return field_array
 
 
-def _get_AI_move(playfield):
+def _get_AI_move(playField):
 
-    field = _flatten_field(playfield)
+    field = _flatten_field(playField)
     moves = AI.predict(field)    #Should return array eg: [0.1, 0.1, 0.3, 0.8, 0.4, 0.2, 0.1]
 
     best_move = np.argmax(moves)    #Returns location of highest val, only first occurrence
 
-    while not _validate_move(best_move):
-        moves[best_move] = 0
+    while not _validate_move(playField, best_move):
+        moves[best_move] = 0.0
         best_move = np.argmax(moves)
 
     log.info("AI selected move at {}".format(best_move))
@@ -177,7 +179,7 @@ def _drop_piece(playField, row, col, player):
     log.debug("P{}: Placing piece at [{}][{}]".format(player, row, col))
     playField[row][col] = player
 
-    if player == 1 and DataGatherMode and GatherMove:
+    if DataGatherMode and GatherMove:
         exportPlay(col)
 
 
@@ -330,9 +332,10 @@ def _input(playField, turn, pos):
     else:
         # if AIMode is not enabled, or its player 1, take input
         if turn%2 == 0 and DataGatherMode:
-            col = random.sample([0,1,2,3,4,5,6], 1)
-            #while not _validate_move(playfield, col):   # todo: <-- why not work?
-            #    col = random.smaple([0,1,2,3,4,5,6], 1)
+            col = random.sample([0, 1, 2, 3, 4, 5, 6], 1)
+            while not _validate_move(playField, col):   # todo: <-- why not work?
+                col = random.smaple([0, 1, 2, 3, 4, 5, 6], 1)
+            log.debug("Randomiser clicked at {}|{} = column: {}".format(pos[0], pos[1], col))
         else:
             posx = pos[0]
             col = int(math.floor(posx/100))
@@ -390,7 +393,7 @@ def _game_loop(playField):
                     turn += 1
             if event.type == pygame.KEYDOWN:
                 # Bit of code for Mark, because he asked for the game to export its current state
-                if event.key == pygame.K_F6:
+                if event.key == pygame.K_F6 and turn%2==1:
                     # Check if the user pressed F6 then export
                     log.debug("Exporting current game state...")
                     flattenAndExport(playField)
