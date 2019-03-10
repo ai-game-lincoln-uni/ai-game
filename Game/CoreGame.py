@@ -334,7 +334,7 @@ def _input(playField, turn, pos):
         if turn%2 == 0 and DataGatherMode:
             col = random.sample([0, 1, 2, 3, 4, 5, 6], 1)
             while not _validate_move(playField, col):   # todo: <-- why not work?
-                col = random.smaple([0, 1, 2, 3, 4, 5, 6], 1)
+                col = random.sample([0, 1, 2, 3, 4, 5, 6], 1)
             log.debug("Randomiser clicked at {}|{} = column: {}".format(pos[0], pos[1], col))
         else:
             posx = pos[0]
