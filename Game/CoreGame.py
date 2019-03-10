@@ -229,7 +229,7 @@ def _winning_move(playField, player):
                 return True
     # Check vertical locations
     for col in range(COLUMN_COUNT):
-        for row in range(ROW_COUNT-1):
+        for row in range(ROW_COUNT-3):
             if (playField[row][col] == player and
                     playField[row+1][col] == player and
                     playField[row+2][col] == player and
