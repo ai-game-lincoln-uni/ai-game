@@ -39,8 +39,7 @@ pygame.display.set_caption("Connect 4 AI Game")
 logo_image = pygame.image.load("unnamed.png")
 pygame.display.set_icon(logo_image)
 
-if AIMode:
-    AI = keras.models.load_model('AI.model')    #Loads the NN model as made and saved in basicNeuralNet.py
+AI = 0    # Variable for NN, set to 0 before loaded
 
 
 def flattenAndExport(playfield):
@@ -366,6 +365,8 @@ def _game_loop(playField):
     """
     global TestMode
     global DataGatherMode
+    global AIMode
+    global AI
 
     log.info("Game Loop started")
     turn = 0
@@ -425,6 +426,12 @@ def _game_loop(playField):
                 if event.key == pygame.K_d:
                     DataGatherMode = not DataGatherMode
                     log.debug("Data Gather mode set to {}".format(DataGatherMode))
+                if event.key == pygame.K_a:
+                    AIMode = not AIMode
+                    if AI == 0:
+                        AI = keras.models.load_model('AI.model')    # If first time AI toggles, imports the NN
+                        log.info("Neural Network model loaded")
+                    log.debug("AI mode set to {}".format(DataGatherMode))
 
         if TestMode:
             col = _input(playField, turn, 1)
