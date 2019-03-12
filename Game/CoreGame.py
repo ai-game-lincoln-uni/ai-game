@@ -82,12 +82,14 @@ def flattenAndExport(playfield):
         return False
 
 
-def exportPlay(column):    #todo: Why this isn't being called?
+def exportPlay(column):    # todo: Why this isn't being called/not working?
     """
     Converts play to an array and exports this data to a text file
     :param column: The players move
     :return:
     """
+
+    log.info("playExport called")
 
     GatherMove = False    # Ensures that only plays after exported boards are recorded
 
@@ -183,7 +185,8 @@ def _drop_piece(playField, row, col, player):
     log.debug("P{}: Placing piece at [{}][{}]".format(player, row, col))
     playField[row][col] = player
 
-    if DataGatherMode and GatherMove:
+    log.info("GatherMove currently {}".format(GatherMove))
+    if GatherMove:    # todo: exportPlay not being called because GatherMove never True, why?
         exportPlay(col)
 
 
@@ -342,7 +345,7 @@ def _input(playField, turn, pos):
         # if AIMode is not enabled, or its player 1, take input
         if turn%2 == 0 and DataGatherMode:
             col = random.sample([0, 1, 2, 3, 4, 5, 6], 1)
-            while not _validate_move(playField, col):   # todo: <-- why not work?
+            while not _validate_move(playField, col):
                 col = random.sample([0, 1, 2, 3, 4, 5, 6], 1)
             log.debug("Randomiser clicked at {}|{} = column: {}".format(pos[0], pos[1], col))
         else:
