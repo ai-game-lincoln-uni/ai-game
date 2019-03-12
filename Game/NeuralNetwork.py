@@ -28,7 +28,10 @@ def _get_data():
     global training_input
     global training_output
 
-    log.info('Fetching training data')    # todo: Ensure data imported as array of arrays, not string arrays
+    training_input = []
+    training_output = []
+
+    log.info('Fetching training data')    # todo: Why data not being imported properly?
 
     number_of_files = int(len(os.listdir('trainingData')))
 
@@ -36,14 +39,14 @@ def _get_data():
         file = 'trainingData/ExportedState{}.txt'.format(file_num)
 
         f = open(file, "r")
-        data = f.read()
+        data = list(f.read())
         training_input.append(data)
 
 
         file = 'trainingData/ExportedMove{}.txt'.format(file_num)
 
         f = open(file, "r")
-        data = f.read()
+        data = list(f.read())
         training_input.append(data)
 
 
@@ -170,9 +173,12 @@ def _load_model(name):
 
 if __name__ == "__main__":
     _get_data()
-    _create_model()
-    _add_input_layer()
-    _add_hidden_layers(3, 128)
-    _add_output_layer(10)
-    _compile_model()
-    _fit_model(3)
+    #_create_model()
+    #_add_input_layer()
+    #_add_hidden_layers(3, 128)
+    #_add_output_layer(10)
+    #_compile_model()
+    #_fit_model(3)
+
+
+    print(training_output)    # todo: why result in '[]'    Data no being entered, why?
