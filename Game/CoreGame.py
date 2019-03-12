@@ -436,8 +436,8 @@ def _game_loop(playField):
                             log.info("Neural Network model loaded")
                         except:
                             log.error("Failed to load Neural Network model")
-                            AIMode = False
-                    log.debug("AI mode set to {}".format(DataGatherMode))
+                            AIMode = False    # Ensures not trying to get info from absent AI
+                    log.debug("AI mode set to {}".format(AIMode))
 
         if TestMode:
             col = _input(playField, turn, 1)
@@ -486,5 +486,5 @@ def start_game():
 if __name__ == "__main__":
     #  If the game is running itself (ie: someone didnt type ``import coreGame```), start the game
     start_game()
-    while TestMode:
+    while TestMode or DataGatherMode:
         start_game()
