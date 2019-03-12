@@ -50,6 +50,7 @@ def flattenAndExport(playfield):
     :return:
     """
 
+    global GatherMove
     GatherMove = True    # The play made at this point to be recorded, for AI target data
 
     dataForExport = []  # Prepare a list for the data to be dumped into
@@ -89,8 +90,8 @@ def exportPlay(column):    # todo: Why this isn't being called/not working?
     :return:
     """
 
-    log.info("playExport called")
 
+    global GatherMove
     GatherMove = False    # Ensures that only plays after exported boards are recorded
 
     dataForExport = []  # Prepare a list for the data to be dumped into
@@ -185,7 +186,6 @@ def _drop_piece(playField, row, col, player):
     log.debug("P{}: Placing piece at [{}][{}]".format(player, row, col))
     playField[row][col] = player
 
-    log.info("GatherMove currently {}".format(GatherMove))
     if GatherMove:    # todo: exportPlay not being called because GatherMove never True, why?
         exportPlay(col)
 
