@@ -312,6 +312,8 @@ def _input(playField, turn, pos):
     """
     # If AI is enabled, this if statement will call ai to give a column number
     if TestMode:
+        if AIMode and (turn % 2 == 0):
+            return _get_AI_move(playField)
         return random.randint(0, ROW_COUNT)
     if turn % 2 == 0 and AIMode:
         log.debug("Polling AI code for its move...")
