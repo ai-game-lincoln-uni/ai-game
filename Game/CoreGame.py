@@ -83,7 +83,7 @@ def flattenAndExport(playfield):
         return False
 
 
-def exportPlay(column):    # todo: Why this isn't being called/not working?
+def exportPlay(column):
     """
     Converts play to an array and exports this data to a text file
     :param column: The players move
@@ -186,7 +186,7 @@ def _drop_piece(playField, row, col, player):
     log.debug("P{}: Placing piece at [{}][{}]".format(player, row, col))
     playField[row][col] = player
 
-    if GatherMove:    # todo: exportPlay not being called because GatherMove never True, why?
+    if GatherMove:    # Exports play if board exported
         exportPlay(col)
 
 
