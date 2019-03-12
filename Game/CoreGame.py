@@ -430,9 +430,13 @@ def _game_loop(playField):
                     log.debug("Data Gather mode set to {}".format(DataGatherMode))
                 if event.key == pygame.K_a:
                     AIMode = not AIMode
-                    if AI == 0:
-                        AI = keras.models.load_model('AI.model')    # If first time AI toggles, imports the NN
-                        log.info("Neural Network model loaded")
+                    if AIMode and AI == 0:
+                        try:
+                            AI = keras.models.load_model('AI.model')    # If first time AI toggles, imports the NN
+                            log.info("Neural Network model loaded")
+                        except:
+                            log.error("Failed to load Neural Network model")
+                            AIMode = False
                     log.debug("AI mode set to {}".format(DataGatherMode))
 
         if TestMode:
