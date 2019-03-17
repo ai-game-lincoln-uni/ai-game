@@ -13,13 +13,13 @@ import keras
 log.debug('\tImported Keras')
 import numpy as np
 log.debug('\tImported Numpy')
-#import matplotlib.pyplot as plt			# Just to see end result, not required for purpose
-#print('\tImported Matplotlib.Pyplot')
 log.info('\tImporting Done\n')
 
 
 training_input = []
 training_output = []
+testing_input = []
+testing_output = []
 model = None
 new_model = None
 
@@ -27,11 +27,15 @@ new_model = None
 def _get_data():
     global training_input
     global training_output
+    global testing_input
+    global testing_output
 
     training_input = []
     training_output = []
+    testing_input = []
+    testing_output = []
 
-    log.info('Fetching training data')    # todo: Why data not being imported properly?
+    log.info('Fetching training and testing data')    # todo: Why data not being imported properly?
 
     number_of_files = int(len(os.listdir('trainingData')))
 
@@ -40,14 +44,20 @@ def _get_data():
 
         f = open(file, "r")
         data = list(f.read())
-        training_input.append(data)
+        if file_num%2==0:
+            training_input.append(data)    # I currently have 1000 data sets, will make more
+        else:
+            testing_input.appdent(data)
 
 
         file = 'trainingData/ExportedMove{}.txt'.format(file_num)
 
         f = open(file, "r")
         data = list(f.read())
-        training_input.append(data)
+        if file_num%2==0:
+            training_output.append(data)
+        else:
+            testing_output.appdent(data)
 
 
     log.info('\tData fetched\n')
