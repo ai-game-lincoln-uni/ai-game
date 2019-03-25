@@ -182,11 +182,15 @@ def _drop_piece(playField, row, col, player):
     :param player: The player making the move
     :return: None
     """
-    log.debug("P{}: Placing piece at [{}][{}]".format(player, row, col))
-    playField[row][col] = player
+    try:
+        log.debug("P{}: Placing piece at [{}][{}]".format(player, row, col))
+        playField[row][col] = player
 
-    if GatherMove:    # Exports play if board exported
-        exportPlay(col)
+        if GatherMove:    # Exports play if board exported
+            exportPlay(col)
+    except Exception as e:
+        log.error("Failed to place piece: {}".format(e))
+        return False
 
 
 def _validate_move(playField, col):
@@ -214,7 +218,7 @@ def _get_next_open_row(playField, col):
         if playField[i][col] == 0:
             log.debug("Selected row {} for {}".format(i, col))
             return i
-    return -1
+    return -1  # negative 1 = no space
 
 
 def _winning_move(playField, player):
@@ -257,6 +261,7 @@ def _winning_move(playField, player):
                     playField[row-2][col+2] == player and
                     playField[row-3][col+3] == player):
                 return True
+    return False
 
 
 def renderer(playField):
@@ -284,6 +289,7 @@ def renderer(playField):
                 if playField[row][col] == 2:
                     pygame.draw.circle(screen, (255, 201, 23), ((col*100)+50, (row*100)+150), radius)
         playField = np.flip(playField, 0)
+        return True
     except Exception as e:
         log.critical("Renderer failed with error {}".format(e))
         _quit(1)
