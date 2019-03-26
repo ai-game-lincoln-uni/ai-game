@@ -39,25 +39,30 @@ def _get_data():
         number_of_files = int(len(os.listdir('trainingData')))
 
         for file_num in range(0, int(number_of_files/2)):
-            file = 'trainingData/ExportedState{}.txt'.format(file_num)
 
-            f = open(file, "r")
+            state_file = 'trainingData/ExportedState{}.txt'.format(file_num)
+            move_file = 'trainingData/ExportedMove{}.txt'.format(file_num)
+
+            f = open(state_file, "r")
             data = list(f.read())
             # data = np.load(file)
-            data = df._format_array_v2(file)
+            data = df._format_array_v2(state_file)
+            data = np.array(data)
             training_input.append(data)
 
-
-            file = 'trainingData/ExportedMove{}.txt'.format(file_num)
-
-            f = open(file, "r")
+            f = open(move_file, "r")
             data = list(f.read())
             # data = np.load(file)
-            data = df._format_array_v2(file)
+            data = df._format_array_v2(move_file)
+            data = np.array(data)
             training_output.append(data)
 
+        training_input = np.array(training_input)
+        training_output = np.array(training_output)
 
-        log.info('\tData fetched\n')
+        log.info('\tData fetched')
+        log.info('\t\tTraining_input length: {}'.format(len(training_input)))
+        log.info('\t\tTraining_out length: {}\n'.format(len(training_output)))
         return True
 
     except:
@@ -88,7 +93,7 @@ def _add_input_layer():
 
         log.info('Adding input layer')
 
-        model.add(keras.layers.Flatten())
+        model.add(keras.layers.Flatten(input_shape=(42)))
 
 
         log.info('\tInput layer added\n')
@@ -106,7 +111,7 @@ def _add_hidden_layers(layers, nodes):
         log.info('Adding {} hidden layers'.format(layers))
 
         for _ in range(layers):
-            model.add(keras.layers.Dense(nodes, activation=tf.nn.relu))
+            model.add(keras.layers.Dense(nodes, input_shape=(41,), activation=tf.nn.relu))
 
 
         log.info('\tHidden layers aadded\n')
@@ -123,7 +128,8 @@ def _add_output_layer(size):
 
         log.info('Adding output layer')
 
-        model.add(keras.layers.Dense(size, activation=tf.nn.softmax))
+        model.add(keras.layers.Dense(size, input_shape=(6, ), activation=tf.nn.softmax))
+        # todo: Error: ValueError: Error when checking target: expected dense_4 to have shape (1,), but got array with shape (6,)
 
 
         log.info('\tOutput layer added\n')
@@ -140,7 +146,7 @@ def _compile_model():
 
         log.info('Network compiling')
 
-        model.compile(optimizer='adam', loss='sparse_catagorical_crossenthropy', metrics=['accuracy'])
+        model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
 
         log.info('\tNetwork compiled\n')
@@ -152,22 +158,36 @@ def _compile_model():
 
 
 def _fit_model(epochs):
-    try:
-        global model
-        global training_input
-        global training_output
+    # try:
+    #     global model
+    #     global training_input
+    #     global training_output
+    #
+    #     log.info('Fitting model')
+    #
+    #     model.fit(training_input, training_output, epochs=epochs)    #Not currently working
+    #
+    #
+    #     log.info('\tModel fitted\n')
+    #     return True
+    #
+    # except:
+    #     log.error('\tUnknown error in NeuralNetwork._fit_model\n')
+    #     return False
 
-        log.info('Fitting model')
+    global model
+    global training_input
+    global training_output
 
-        model.fit(training_input, training_output, epochs=epochs)    #Not currently working
+    print(model.summary())
+
+    log.info('Fitting model')
+
+    model.fit(training_input, training_output, epochs=epochs)    #Not currently working
 
 
-        log.info('\tModel fitted\n')
-        return True
-
-    except:
-        log.error('\tUnknown error in NeuralNetwork._fit_model\n')
-        return False
+    log.info('\tModel fitted\n')
+    return True
 
 
 def _evaluate_model():
@@ -239,12 +259,15 @@ def _load_model(name):
 
 if __name__ == "__main__":
     _get_data()
-    #_create_model()
-    #_add_input_layer()
-    #_add_hidden_layers(3, 128)
-    #_add_output_layer(10)
-    #_compile_model()
-    #_fit_model(3)
+    _create_model()
+    _add_input_layer()
+    _add_hidden_layers(3, 128)
+    _add_output_layer(7)
+    _compile_model()
+    _fit_model(3)
 
 
-    log.info('Training_Output data:\t{} '.format(training_output[0][0]))
+    # log.info('Training_Input data:\t{} '.format(training_input[5]))
+    # log.info('Training_Output data:\t{} '.format(training_output[5]))
+    # log.info('Testing_Input data:\t{} '.format(testing_input[0][0]))
+    # log.info('Testing_Output data:\t{} '.format(testing_output[0][0]))
