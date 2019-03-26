@@ -1,3 +1,11 @@
+"""
+Name: NeuralNetwork.py
+Version: 0.01
+Purpose: Creates/Saves/Loads neural network for Connect-Four game
+Author: Graham Mark Broadbent
+Date: 12/03/19
+"""
+
 import logging
 from logManager import log
 
