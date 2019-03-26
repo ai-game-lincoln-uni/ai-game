@@ -1,3 +1,11 @@
+"""
+Name: DataFormatter.py
+Version: 0.01
+Purpose: Format array in file to usable format
+Author: Graham Mark Broadbent
+Date: 25/03/19
+"""
+
 import logging
 from logManager import log
 
