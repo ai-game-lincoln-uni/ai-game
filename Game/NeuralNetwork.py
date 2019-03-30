@@ -23,8 +23,6 @@ import keras
 log.debug('\tImported Keras')
 import numpy as np
 log.debug('\tImported Numpy')
-#import matplotlib.pyplot as plt			# Just to see end result, not required for purpose
-#print('\tImported Matplotlib.Pyplot')
 log.info('\tImporting Done\n')
 
 
@@ -51,17 +49,21 @@ def _get_data():
             state_file = 'trainingData/ExportedState{}.txt'.format(file_num)
             move_file = 'trainingData/ExportedMove{}.txt'.format(file_num)
 
-            f = open(state_file, "r")
-            data = list(f.read())
-            # data = np.load(file)
             data = df._format_array_v2(state_file)
+
+            if not data:
+                log.error('Failed to load data')
+                return False
+
             data = np.array(data)
             training_input.append(data)
 
-            f = open(move_file, "r")
-            data = list(f.read())
-            # data = np.load(file)
             data = df._format_array_v2(move_file)
+
+            if not data:
+                log.error('Failed to load data')
+                return False
+
             data = np.array(data)
             training_output.append(data)
 
@@ -101,7 +103,8 @@ def _add_input_layer():
 
         log.info('Adding input layer')
 
-        model.add(keras.layers.Flatten(input_shape=(42)))
+        model.add(keras.layers.Flatten(input_shape=(None, 42), output_size=42))
+        # model.add(keras.layers.Flatten(input_dim=41))
 
 
         log.info('\tInput layer added\n')
@@ -119,7 +122,7 @@ def _add_hidden_layers(layers, nodes):
         log.info('Adding {} hidden layers'.format(layers))
 
         for _ in range(layers):
-            model.add(keras.layers.Dense(nodes, input_shape=(41,), activation=tf.nn.relu))
+            model.add(keras.layers.Dense(nodes, activation=tf.nn.relu, output_size=42))
 
 
         log.info('\tHidden layers aadded\n')
@@ -136,8 +139,8 @@ def _add_output_layer(size):
 
         log.info('Adding output layer')
 
-        model.add(keras.layers.Dense(size, input_shape=(6, ), activation=tf.nn.softmax))
-        # todo: Error: ValueError: Error when checking target: expected dense_4 to have shape (1,), but got array with shape (6,)
+        model.add(keras.layers.Dense(size, activation=tf.nn.softmax, output_size=6))
+        # todo: ValueError: Error when checking target: expected dense_4 to have shape (1,), but got array with shape (6,)
 
 
         log.info('\tOutput layer added\n')
@@ -187,11 +190,11 @@ def _fit_model(epochs):
     global training_input
     global training_output
 
-    print(model.summary())
+    # print(model.summary())
 
     log.info('Fitting model')
 
-    model.fit(training_input, training_output, epochs=epochs)    #Not currently working
+    model.fit(training_input, training_output, epochs=epochs)    # Not currently working
 
 
     log.info('\tModel fitted\n')
