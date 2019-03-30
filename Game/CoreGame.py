@@ -472,6 +472,82 @@ def _game_loop(playField):
         except ValueError:
             pass
 
+def main_menu():
+    main = True
+    counter = 0
+    difficulty = ["Easy", "Medium", "Hard"]
+    blue = (29, 92, 193)
+    white = (255, 255, 255)
+    black = (0, 0, 0)
+    yellow = (255, 255, 0)
+    dark_yellow = (210, 225, 0)
+    red = (255, 0, 0)
+    dark_red = (210, 0, 0)
+    while main:
+        for event in pygame.event.get():
+            print(event)
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+        screen.fill(blue)
+        large_text = pygame.font.Font('freesansbold.ttf', 115)
+        small_text = pygame.font.Font("freesansbold.ttf",20)
+        text_surface = large_text.render("Connect 4", True, black)
+        text_rect = text_surface.get_rect()
+        text_rect.center = ((width/2),(height/2))
+        screen.blit(text_surface, text_rect)
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+        if 225+150 > mouse[0] > 225 and 550+50 > mouse[1] > 550:
+            pygame.draw.rect(screen, dark_yellow, (225,550,150,50))
+            if click[0] == 1:
+                screen.fill(black)
+                main = False
+        else:
+            pygame.draw.rect(screen, yellow, (225,550,150,50))
+            
+        if 525+150 > mouse[0] > 525 and 550+50 > mouse[1] > 550:
+            pygame.draw.rect(screen, dark_red, (525,550,150,50))
+
+            if click[0] == 1:
+                pygame.quit()
+                quit()
+            
+        else:
+            pygame.draw.rect(screen, red, (525,550,150,50))
+
+
+        if 375+150 > mouse[0] > 375 and 450+50 > mouse[1] > 450:
+            pygame.draw.rect(screen, dark_yellow, (375,450,150,50))
+            if click[0] == 1:
+                
+                if counter == 2:
+                    counter = 0
+                else:
+                    counter += 1
+                pygame.time.wait(100)
+        else:
+            pygame.draw.rect(screen, yellow, (375,450,150,50))
+
+        text_surface = small_text.render(difficulty[counter], True, black)
+        text_rect = text_surface.get_rect()
+        text_rect.center = ((375 + (150 / 2)), (450 + (50 / 2)))
+        screen.blit(text_surface, text_rect)
+        
+        text_surface = small_text.render("Play", True, black)
+        text_rect = text_surface.get_rect()
+        text_rect.center = ((225 + (150 / 2)), (550 + (50 / 2)))
+        screen.blit(text_surface, text_rect)
+
+        text_surface = small_text.render("Quit", True, black)
+        text_rect = text_surface.get_rect()
+        text_rect.center = ((525 + (150 / 2)), (550 + (50 / 2)))
+        screen.blit(text_surface, text_rect)
+        
+        pygame.display.update()
+
+        
 
 def start_game():
     """
@@ -479,6 +555,7 @@ def start_game():
 
     :return: None
     """
+    main_menu()
     log.info("Initialising game...")
     playField = _create_playField(ROW_COUNT, COLUMN_COUNT)  # Creates a playfield of size designated at the top of this file
     log.info("Rendering playfield...")
@@ -494,3 +571,4 @@ if __name__ == "__main__":
     start_game()
     while TestMode or DataGatherMode:
         start_game()
+
