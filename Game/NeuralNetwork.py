@@ -70,6 +70,9 @@ def _get_data():
         training_input = np.array(training_input)
         training_output = np.array(training_output)
 
+        log.info("Input array shape: {}".format(training_input.shape))
+        log.info("Input data array shape: {}".format(training_input[0].shape))
+
         log.info('\tData fetched')
         log.info('\t\tTraining_input length: {}'.format(len(training_input)))
         log.info('\t\tTraining_out length: {}\n'.format(len(training_output)))
@@ -98,55 +101,63 @@ def _create_model():
 
 
 def _add_input_layer():
-    try:
+    # try:
         global model
 
         log.info('Adding input layer')
 
-        model.add(keras.layers.Flatten(input_shape=(None, 42), output_size=42))
+        # model.add(keras.layers.Flatten(input_shape=(None, 42), output_size=42))
+
+        # model.add(keras.layers.Flatten)
+        model.add(keras.layers.Flatten(input_shape=(1000, 41, )))
+        # model.add(keras.layers.Input( shape=(1000, 41, )))
         # model.add(keras.layers.Flatten(input_dim=41))
 
 
         log.info('\tInput layer added\n')
         return True
 
-    except:
+    # except:
         log.error('\tUnknown error in NeuralNetwork._add_input_layer\n')
         return False
 
 
 def _add_hidden_layers(layers, nodes):
-    try:
+    # try:
         global model
 
         log.info('Adding {} hidden layers'.format(layers))
 
         for _ in range(layers):
-            model.add(keras.layers.Dense(nodes, activation=tf.nn.relu, output_size=42))
+            # model.add(keras.layers.Dense(nodes, activation=tf.nn.relu, output_size=42))
+            model.add(keras.layers.Dense(nodes, activation=tf.nn.relu))
 
+            # model.add(keras.layers.flatten())
 
         log.info('\tHidden layers aadded\n')
         return True
 
-    except:
+    # except:
         log.error('\tUnknown error in NeuralNetwork._add_hidden_layers\n')
         return False
 
 
 def _add_output_layer(size):
-    try:
+    # try:
         global model
 
         log.info('Adding output layer')
+        model.add(keras.layers.Flatten())
 
-        model.add(keras.layers.Dense(size, activation=tf.nn.softmax, output_size=6))
+        # model.add(keras.layers.Dense(size, activation=tf.nn.softmax, output_size=6))
+        model.add(keras.layers.Dense(size, activation=tf.nn.softmax))
         # todo: ValueError: Error when checking target: expected dense_4 to have shape (1,), but got array with shape (6,)
 
 
         log.info('\tOutput layer added\n')
         return True
 
-    except:
+    # except:
         log.error('\tUnknown error in NeuralNetwork._add_output_layer\n')
         return False
 
@@ -272,7 +283,7 @@ if __name__ == "__main__":
     _get_data()
     _create_model()
     _add_input_layer()
-    _add_hidden_layers(3, 128)
+    _add_hidden_layers(1, 128)
     _add_output_layer(7)
     _compile_model()
     _fit_model(3)
