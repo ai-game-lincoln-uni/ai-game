@@ -427,7 +427,7 @@ def _game_loop(playField):
                     log.debug("Exporting current game state...")
                     flattenAndExport(playField)
                 if event.key == pygame.K_t:
-                    TestMode= not TestMode
+                    TestMode = not TestMode
                     renderer(playField)
                     pygame.display.flip()
                     log.debug("Test Mode set to {}".format(TestMode))
@@ -462,7 +462,7 @@ def _game_loop(playField):
         unique, counts = np.unique(playField, return_counts=True)
         dictionary = dict(zip(unique, counts))
         try:
-            if  dictionary[0] == 0:
+            if dictionary[0] == 0:
                 return
         except KeyError:
             log.warning("Playfield full, restarting...")
@@ -473,6 +473,11 @@ def _game_loop(playField):
             pass
 
 def main_menu():
+    # Escape condition if test mode is enabled
+    if TestMode:
+        return
+
+    log.info("Loading main menu")
     main = True
     counter = 0
     difficulty = ["Easy", "Medium", "Hard"]
@@ -490,7 +495,6 @@ def main_menu():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-
         screen.fill(blue)
         large_text = pygame.font.Font('freesansbold.ttf', 115)
         small_text = pygame.font.Font("freesansbold.ttf",20)
