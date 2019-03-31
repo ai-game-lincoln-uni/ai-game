@@ -139,6 +139,11 @@ def exportPlay(column):
 
 
 def _flatten_field(playField):
+    """
+    Flattens the playfield array
+    :param playField: 2d array
+    :return: 1d array
+    """
     field_array = []
 
     for row in playField:
@@ -149,6 +154,11 @@ def _flatten_field(playField):
 
 
 def _get_AI_move(playField):
+    """
+    Gets the AIs next move
+    :param playField:
+    :return: int of move
+    """
 
     field = _flatten_field(playField)
     moves = AI.predict(field)    #Should return array eg: [0.1, 0.1, 0.3, 0.8, 0.4, 0.2, 0.1]
@@ -499,7 +509,12 @@ def _game_loop(playField):
         except ValueError:
             pass
 
+
 def main_menu():
+    """
+    The main menu screen
+    :return: None
+    """
     # Escape condition if test mode is enabled
     if TestMode:
         return
