@@ -485,7 +485,8 @@ def main_menu():
     dark_red = (210, 0, 0)
     while main:
         for event in pygame.event.get():
-            print(event)
+            if event.type != pygame.MOUSEMOTION:
+                log.debug(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
@@ -506,14 +507,14 @@ def main_menu():
                 main = False
         else:
             pygame.draw.rect(screen, yellow, (225,550,150,50))
-            
+
         if 525+150 > mouse[0] > 525 and 550+50 > mouse[1] > 550:
             pygame.draw.rect(screen, dark_red, (525,550,150,50))
 
             if click[0] == 1:
                 pygame.quit()
                 quit()
-            
+
         else:
             pygame.draw.rect(screen, red, (525,550,150,50))
 
@@ -521,7 +522,7 @@ def main_menu():
         if 375+150 > mouse[0] > 375 and 450+50 > mouse[1] > 450:
             pygame.draw.rect(screen, dark_yellow, (375,450,150,50))
             if click[0] == 1:
-                
+
                 if counter == 2:
                     counter = 0
                 else:
@@ -534,7 +535,7 @@ def main_menu():
         text_rect = text_surface.get_rect()
         text_rect.center = ((375 + (150 / 2)), (450 + (50 / 2)))
         screen.blit(text_surface, text_rect)
-        
+
         text_surface = small_text.render("Play", True, black)
         text_rect = text_surface.get_rect()
         text_rect.center = ((225 + (150 / 2)), (550 + (50 / 2)))
@@ -544,7 +545,7 @@ def main_menu():
         text_rect = text_surface.get_rect()
         text_rect.center = ((525 + (150 / 2)), (550 + (50 / 2)))
         screen.blit(text_surface, text_rect)
-        
+
         pygame.display.update()
 
         
