@@ -38,8 +38,12 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Connect 4 AI Game")
 logo_image = pygame.image.load("unnamed.png")
 pygame.display.set_icon(logo_image)
-
+turn = 0  # Variable to hold turn for UI
 AI = 0    # Variable for NN, set to 0 before loaded
+
+# Text objects
+large_text = pygame.font.Font('freesansbold.ttf', 115)
+small_text = pygame.font.Font("freesansbold.ttf", 20)
 
 
 def flattenAndExport(playfield):
@@ -375,6 +379,7 @@ def _game_loop(playField):
     global DataGatherMode
     global AIMode
     global AI
+    global turn
 
     log.info("Game Loop started")
     turn = 0
@@ -496,8 +501,6 @@ def main_menu():
                 pygame.quit()
                 quit()
         screen.fill(blue)
-        large_text = pygame.font.Font('freesansbold.ttf', 115)
-        small_text = pygame.font.Font("freesansbold.ttf",20)
         text_surface = large_text.render("Connect 4", True, black)
         text_rect = text_surface.get_rect()
         text_rect.center = ((width/2),(height/2))
