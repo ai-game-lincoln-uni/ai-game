@@ -275,6 +275,7 @@ def renderer(playField):
     :param playField: The play field
     :return: None
     """
+    screen.fill((0, 0, 0))
     try:
         playField = np.flip(playField, 0)
 
@@ -293,6 +294,27 @@ def renderer(playField):
                 if playField[row][col] == 2:
                     pygame.draw.circle(screen, (255, 201, 23), ((col*100)+50, (row*100)+150), radius)
         playField = np.flip(playField, 0)
+
+        ### User interface junk
+        # Create all needed surfaces
+        textSurfaces = {
+            "title": small_text.render("Connect 4", True, (255, 255, 255)),
+            "NullSpacer": small_text.render("Wooo im invisible", False, (0, 0, 0)),
+            "turnNum": small_text.render("Turn: " + str(turn), True, (255, 255, 255)),
+            "AIMode": small_text.render("AI: %s" % ("Active" if AIMode else "Disabled"), True, (255, 255, 255)),
+            "TestMode": small_text.render("TestMode: %s" % ("Active" if TestMode else "Disabled"), True, (255, 255, 255)),
+        }
+
+        # starting positions
+        posX = ROW_COUNT*100 + 200
+        posY = 125
+        # Iterate through all surfaces
+        for key, value in textSurfaces.items():
+            rect = textSurfaces[key].get_rect()
+            rect.center = (posX, posY)
+            posY += 25
+            screen.blit(textSurfaces[key], rect)
+
         return True
     except Exception as e:
         log.critical("Renderer failed with error {}".format(e))
@@ -382,7 +404,7 @@ def _game_loop(playField):
     global turn
 
     log.info("Game Loop started")
-    turn = 0
+    turn = 1
     while True:
         # BIG SCARY EVENT LOOP!
         for event in pygame.event.get():  # poll pygame for events
