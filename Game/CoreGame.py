@@ -523,6 +523,7 @@ def main_menu():
     main = True
     counter = 0
     difficulty = ["Easy", "Medium", "Hard"]
+    # Variables to hold various colours
     blue = (29, 92, 193)
     white = (255, 255, 255)
     black = (0, 0, 0)
@@ -530,6 +531,19 @@ def main_menu():
     dark_yellow = (210, 225, 0)
     red = (255, 0, 0)
     dark_red = (210, 0, 0)
+    # Renders text for each button
+    text_surface = small_text.render(difficulty[counter], True, black)
+    text_surface1 = large_text.render("Connect 4", True, black)
+    text_surface2 = small_text.render("Play", True, black)
+    text_surface3 = small_text.render("Quit", True, black)
+    
+    screen.fill(blue)
+    # Draws the main title
+    text_rect = text_surface1.get_rect()
+    text_rect.center = ((width/2),(height/2))
+    screen.blit(text_surface1, text_rect)
+
+    #Loop to update the main menu while it is in use
     while main:
         for event in pygame.event.get():
             if event.type != pygame.MOUSEMOTION:
@@ -537,24 +551,26 @@ def main_menu():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-        screen.fill(blue)
-        text_surface = large_text.render("Connect 4", True, black)
-        text_rect = text_surface.get_rect()
-        text_rect.center = ((width/2),(height/2))
-        screen.blit(text_surface, text_rect)
+            
+        # Variables to store mouse information
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
+        # If statement to respond to users interaction with play button
         if 225+150 > mouse[0] > 225 and 550+50 > mouse[1] > 550:
+            # Change button colour while it is under cursor
             pygame.draw.rect(screen, dark_yellow, (225,550,150,50))
+            # End loop and take player to the game if they click play
             if click[0] == 1:
                 screen.fill(black)
                 main = False
         else:
             pygame.draw.rect(screen, yellow, (225,550,150,50))
 
+        # If statement to respond to users interaction with quit button
         if 525+150 > mouse[0] > 525 and 550+50 > mouse[1] > 550:
+            # Change button colour while it is under cursor
             pygame.draw.rect(screen, dark_red, (525,550,150,50))
-
+            # Exit the game if the user presses quit
             if click[0] == 1:
                 pygame.quit()
                 quit()
@@ -562,37 +578,41 @@ def main_menu():
         else:
             pygame.draw.rect(screen, red, (525,550,150,50))
 
-
+        # If statement to respond to users interaction with difficulty button
         if 375+150 > mouse[0] > 375 and 450+50 > mouse[1] > 450:
+            # Change button colour while it is under cursor
             pygame.draw.rect(screen, dark_yellow, (375,450,150,50))
+            # Changes counter that corresponds with difficulty type if clicked
             if click[0] == 1:
-
+                
                 if counter == 2:
                     counter = 0
                 else:
                     counter += 1
+                # Renders text with new difficulty setting
+                text_surface = small_text.render(difficulty[counter], True, black)
                 pygame.time.wait(100)
         else:
             pygame.draw.rect(screen, yellow, (375,450,150,50))
 
-        text_surface = small_text.render(difficulty[counter], True, black)
+        # Draws difficulty text onto button
         text_rect = text_surface.get_rect()
         text_rect.center = ((375 + (150 / 2)), (450 + (50 / 2)))
         screen.blit(text_surface, text_rect)
 
-        text_surface = small_text.render("Play", True, black)
-        text_rect = text_surface.get_rect()
+        # Draws play text onto button
+        text_rect = text_surface2.get_rect()
         text_rect.center = ((225 + (150 / 2)), (550 + (50 / 2)))
-        screen.blit(text_surface, text_rect)
+        screen.blit(text_surface2, text_rect)
 
-        text_surface = small_text.render("Quit", True, black)
-        text_rect = text_surface.get_rect()
+        # Draws quit text onto button
+        text_rect = text_surface3.get_rect()
         text_rect.center = ((525 + (150 / 2)), (550 + (50 / 2)))
-        screen.blit(text_surface, text_rect)
+        screen.blit(text_surface3, text_rect)
 
+        # Updates display
         pygame.display.update()
 
-        
 
 def start_game():
     """
