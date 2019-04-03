@@ -41,41 +41,41 @@ def _get_data():
         training_output = []
 
         log.info('Fetching training data')
-
-        number_of_files = int(len(os.listdir('trainingData')))
+        
+        try:
+            number_of_files = int(len(os.listdir('trainingData')))
+        except:
+            log.error('Directory trainingData does not exist')
+            return False
 
         for file_num in range(0, int(number_of_files/2)):
 
             state_file = 'trainingData/ExportedState{}.txt'.format(file_num)
             move_file = 'trainingData/ExportedMove{}.txt'.format(file_num)
 
-            data = df._format_array_v2(state_file)
+            state_data = df._format_array_v2(state_file)
+            move_data = df._format_array_v2(move_file)
 
-            if not data:
-                log.error('Failed to load data')
+            if not state_data:
+                log.error('Failed to load board state data')
+                return False
+            
+            if not move_data:
+                log.error('Failed to load move data')
                 return False
 
-            data = np.array(data)
-            training_input.append(data)
-
-            data = df._format_array_v2(move_file)
-
-            if not data:
-                log.error('Failed to load data')
-                return False
-
-            data = np.array(data)
-            training_output.append(data)
+            state_data = np.array(state_data)
+            move_data = np.array(move_data)
+            
+            training_input.append(state_data)
+            training_output.append(move_data)
 
         training_input = np.array(training_input)
         training_output = np.array(training_output)
 
-        log.info("Input array shape: {}".format(training_input.shape))
-        log.info("Input data array shape: {}".format(training_input[0].shape))
-
         log.info('\tData fetched')
-        log.info('\t\tTraining_input length: {}'.format(len(training_input)))
-        log.info('\t\tTraining_out length: {}\n'.format(len(training_output)))
+        log.info('\t\tTraining_input length: {}\tShape: {}'.format(len(training_input), training_input.shape))
+        log.info('\t\tTraining_out length: {}\tShape: {}\n'.format(len(training_output), training_output.shape))
         return True
 
     except:
