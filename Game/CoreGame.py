@@ -43,8 +43,61 @@ AI = 0    # Variable for NN, set to 0 before loaded
 
 # Text objects
 large_text = pygame.font.Font('freesansbold.ttf', 115)
+medium_text = pygame.font.Font('freesansbold.ttf', 50)
 small_text = pygame.font.Font("freesansbold.ttf", 20)
 
+def end_screen(player, turns):
+    pygame.time.wait(100)
+    main = True
+    # Colour variables
+    blue = (29, 92, 193)
+    yellow = (255, 255, 0)
+    dark_yellow = (210, 225, 0)
+    white = (255, 255, 255)
+    black = (0, 0, 0)
+    # Text surfaces for the title and button
+    text_surface = medium_text.render("Player {} is the Winner in {} turns!".format(player, turns), True, black)
+    text_surface1 = small_text.render("Return to main menu", True, black)
+
+    # Make blue background
+    screen.fill(blue)
+
+    # Draws the title
+    text_rect = text_surface.get_rect()
+    text_rect.center = ((width/2),(height/2))
+    screen.blit(text_surface, text_rect)
+
+    # Loop to update end screen while in use
+    while main:
+        for event in pygame.event.get():
+            if event.type != pygame.MOUSEMOTION:
+                log.debug(event)
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+    
+        # Variables to hold mouse interaction
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        # If the button is under the cursor
+        if 340+220 > mouse[0] > 340 and 550+50 > mouse[1] > 550:
+            # Change button colour while it is under cursor
+            pygame.draw.rect(screen, dark_yellow, (340,550,220,50))
+            # Call the start of the game for replaying
+            if click[0] == 1:
+                start_game()
+        else:
+            # Draw the button as default
+            pygame.draw.rect(screen, yellow, (340,550,220,50))
+
+        # Draw the buttons text onto the button
+        text_rect = text_surface1.get_rect()
+        text_rect.center = ((340 + (220 / 2)), (550 + (50 / 2)))
+        screen.blit(text_surface1, text_rect)
+
+        # Update the end screen
+        pygame.display.update()
 
 def flattenAndExport(playfield):
     """
@@ -447,6 +500,7 @@ def _game_loop(playField):
                                 print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
                                 if not TestMode:
                                     pygame.display.update()
+                                    end_screen(turn % 2 + 1, turn)
                                     pygame.time.wait(2000)  # wait for a bit to allow the player to  B A S K  in their glory                       quit()
                                     return  # exit the game loop and quit
                                 return
@@ -493,7 +547,9 @@ def _game_loop(playField):
                         renderer(playField)
                         pygame.display.update()
                         print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
+                        end_screen(turn % 2 + 1, turn)
                         pygame.time.wait(10)
+                        
                         return
                     turn += 1
         unique, counts = np.unique(playField, return_counts=True)
@@ -508,6 +564,7 @@ def _game_loop(playField):
             return
         except ValueError:
             pass
+
 
 
 def main_menu():
@@ -536,12 +593,32 @@ def main_menu():
     text_surface1 = large_text.render("Connect 4", True, black)
     text_surface2 = small_text.render("Play", True, black)
     text_surface3 = small_text.render("Quit", True, black)
+    # Renders text for instructions
+    Instructions1 = small_text.render("Instructions:", True, black)
+    Instructions2 = small_text.render("Click to place a counter in the lowest available position in the column", True, black)
+    Instructions3 = small_text.render("The next player will do the same", True, black)
+    Instructions4 = small_text.render("To win get four counters of your colour in a diagonal or straight row of 4", True, black)
     
     screen.fill(blue)
+    
     # Draws the main title
     text_rect = text_surface1.get_rect()
-    text_rect.center = ((width/2),(height/2))
+    text_rect.center = ((width/2),(height/4))
     screen.blit(text_surface1, text_rect)
+
+    # Draws the instructions
+    text_rect = Instructions1.get_rect()
+    text_rect.center = ((width/2),(height/2 - 50))
+    screen.blit(Instructions1, text_rect)
+    text_rect = Instructions2.get_rect()
+    text_rect.center = ((width/2),(height/2 - 25))
+    screen.blit(Instructions2, text_rect)
+    text_rect = Instructions3.get_rect()
+    text_rect.center = ((width/2),(height/2))
+    screen.blit(Instructions3, text_rect)
+    text_rect = Instructions4.get_rect()
+    text_rect.center = ((width/2),(height/2 + 25))
+    screen.blit(Instructions4, text_rect)
 
     #Loop to update the main menu while it is in use
     while main:
@@ -612,7 +689,6 @@ def main_menu():
 
         # Updates display
         pygame.display.update()
-
 
 def start_game():
     """
