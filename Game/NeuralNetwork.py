@@ -29,6 +29,7 @@ log.info('\tImporting Done\n')
 training_input = []
 training_output = []
 model = None
+vgg16_model = None
 new_model = None
 
 
@@ -41,41 +42,41 @@ def _get_data():
         training_output = []
 
         log.info('Fetching training data')
-        
-        try:
-            number_of_files = int(len(os.listdir('trainingData')))
-        except:
-            log.error('Directory trainingData does not exist')
-            return False
+
+        number_of_files = int(len(os.listdir('trainingData')))
 
         for file_num in range(0, int(number_of_files/2)):
 
             state_file = 'trainingData/ExportedState{}.txt'.format(file_num)
             move_file = 'trainingData/ExportedMove{}.txt'.format(file_num)
 
-            state_data = df._format_array_v2(state_file)
-            move_data = df._format_array_v2(move_file)
+            data = df._format_array_v2(state_file)
 
-            if not state_data:
-                log.error('Failed to load board state data')
-                return False
-            
-            if not move_data:
-                log.error('Failed to load move data')
+            if not data:
+                log.error('Failed to load data')
                 return False
 
-            state_data = np.array(state_data)
-            move_data = np.array(move_data)
-            
-            training_input.append(state_data)
-            training_output.append(move_data)
+            data = np.array(data)
+            training_input.append(data)
+
+            data = df._format_array_v2(move_file)
+
+            if not data:
+                log.error('Failed to load data')
+                return False
+
+            data = np.array(data)
+            training_output.append(data)
 
         training_input = np.array(training_input)
         training_output = np.array(training_output)
 
+        log.info("Input array shape: {}".format(training_input.shape))
+        log.info("Input data array shape: {}".format(training_input[0].shape))
+
         log.info('\tData fetched')
-        log.info('\t\tTraining_input length: {}\tShape: {}'.format(len(training_input), training_input.shape))
-        log.info('\t\tTraining_out length: {}\tShape: {}\n'.format(len(training_output), training_output.shape))
+        log.info('\t\tTraining_input length: {}'.format(len(training_input)))
+        log.info('\t\tTraining_out length: {}\n'.format(len(training_output)))
         return True
 
     except:
@@ -86,10 +87,12 @@ def _get_data():
 def _create_model():
     try:
         global model
+        global vgg16_model
 
         log.info('Creating network model')
 
         model = keras.models.Sequential()
+        # vgg16_model = VGG16(weights="imagent", include_top="false", input_shape=(1000,41,))
 
 
         log.info('\tNetwork model created\n')
@@ -109,7 +112,7 @@ def _add_input_layer():
         # model.add(keras.layers.Flatten(input_shape=(None, 42), output_size=42))
 
         # model.add(keras.layers.Flatten)
-        model.add(keras.layers.Flatten(input_shape=(1000, 41, )))
+        model.add(keras.layers.Flatten(input_shape=(1000, 41, 1)))
         # model.add(keras.layers.Input( shape=(1000, 41, )))
         # model.add(keras.layers.Flatten(input_dim=41))
 
@@ -131,8 +134,8 @@ def _add_hidden_layers(layers, nodes):
         for _ in range(layers):
             # model.add(keras.layers.Dense(nodes, activation=tf.nn.relu, output_size=42))
             model.add(keras.layers.Dense(nodes, activation=tf.nn.relu))
-
-            # model.add(keras.layers.flatten())
+            model.add(keras.layers.Dropout(0.01))    # Prevents over-fitting the model while training (memorisation)
+            # model.add(keras.layers.Flatten())
 
         log.info('\tHidden layers aadded\n')
         return True
@@ -147,11 +150,13 @@ def _add_output_layer(size):
         global model
 
         log.info('Adding output layer')
-        model.add(keras.layers.Flatten())
+        print(model.summary())
+        model.add(keras.layers.Flatten())    # todo: Currently cuts off here
+        # todo: Flatten layer expecten min_ndim=3, got ndim=2
 
         # model.add(keras.layers.Dense(size, activation=tf.nn.softmax, output_size=6))
         model.add(keras.layers.Dense(size, activation=tf.nn.softmax))
-        # todo: ValueError: Error when checking target: expected dense_4 to have shape (1,), but got array with shape (6,)
+        # todo: ValueError: Error when checking target: expected dense_4 to have shape (1,), but got array with shape (6,)    Sorted?
 
 
         log.info('\tOutput layer added\n')
@@ -168,7 +173,8 @@ def _compile_model():
 
         log.info('Network compiling')
 
-        model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+        # model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+        model.compile(optimizer='adam')
 
 
         log.info('\tNetwork compiled\n')
@@ -204,7 +210,6 @@ def _fit_model(epochs):
     # print(model.summary())
 
     log.info('Fitting model')
-
     model.fit(training_input, training_output, epochs=epochs)    # Not currently working
 
 
@@ -264,6 +269,7 @@ def _load_model(name):
         try:
             new_model = keras.models.load_model(name)
             log.info('\tLoaded model "{}"\n'.format(name))
+            # keras.plot_model(new_model, to_file='Model.png')    # Would be a nice idea
             return True
 
         except:
@@ -272,6 +278,19 @@ def _load_model(name):
     except:
         log.error('\tUnknown error in NeuralNetwork._load_model\n')
         return False
+
+def _create():
+    global model
+    model = None
+
+    _get_data()
+    _get_data()
+    _create_model()
+    _add_input_layer()
+    _add_hidden_layers(1, 10)
+    _add_output_layer(7)
+    _compile_model()
+    _fit_model(3)
 
 
 
@@ -283,9 +302,10 @@ if __name__ == "__main__":
     _get_data()
     _create_model()
     _add_input_layer()
-    _add_hidden_layers(1, 128)
+    _add_hidden_layers(1, 10)
     _add_output_layer(7)
     _compile_model()
+    print(model.summary())
     _fit_model(3)
 
 
