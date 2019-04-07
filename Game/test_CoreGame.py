@@ -15,14 +15,14 @@ import CoreGame
 ROW_COUNT = 6
 COLUMN_COUNT = 7
 
-def test_flattenAndExport(): #DONE
+def test_flattenAndExport():
     playField = CoreGame._create_playField(6, 7)
     
     # this function should always return true unless there is an error
     assert CoreGame.flattenAndExport(playField) == True
 
 
-def test_exportplay(): #DONE
+def test_exportplay():
     playField = CoreGame._create_playField(6, 7)
     
     # this function should always return true for each column unless there is an error
@@ -35,7 +35,7 @@ def test_exportplay(): #DONE
     assert CoreGame.exportPlay(6) == True
 
 
-def test__flatten_field(): #DONE
+def test__flatten_field():
     playField = CoreGame._create_playField(6, 7)
     
     # flatten field should leave the field as a 1d array of 0s
@@ -44,10 +44,7 @@ def test__flatten_field(): #DONE
     assert CoreGame._flatten_field(playField) == array
 
 
-#def test__get_AI_move(): #?
-
-
-def test__create_playField(): #DONE
+def test__create_playField():
     playField = CoreGame._create_playField(6, 7)
 
     # the assertion that the play field is a 2d array of 6x7 0s should return true
@@ -55,7 +52,7 @@ def test__create_playField(): #DONE
     np.testing.assert_equal(playField, np.zeros((6, 7)))
 
 
-def test__drop_piece(): #DONE
+def test__drop_piece():
     playField = CoreGame._create_playField(6, 7)
 
     # ensures that a random location at the start of the game will return false (no errors)
@@ -70,7 +67,7 @@ def test__drop_piece(): #DONE
     assert CoreGame._drop_piece(playField, 6, 2, 1) == False
 
 
-def test__validate_move(): #DONE
+def test__validate_move():
     playField = CoreGame._create_playField(6, 7)
 
     # ensures the top row of the column (chosen ehre at random) is empty
@@ -83,7 +80,7 @@ def test__validate_move(): #DONE
     assert CoreGame._validate_move(playField, 3) == False
 
 
-def test__get_next_open_row(): #DONE
+def test__get_next_open_row():
     playField = CoreGame._create_playField(6, 7)
 
     # initially finds a location on the field chosen at random
@@ -97,19 +94,20 @@ def test__get_next_open_row(): #DONE
     assert CoreGame._get_next_open_row(playField, 0) == 2
 
 
-
-def test__winning_move(): #DONE
+def test__winning_move():
     playField = CoreGame._create_playField(6, 7)
 
     # checks the default empty play field returns false
     assert CoreGame._winning_move(playField, 1) == False
 
+    # ensures a horizontal 4 in a row returns True for winning move
     CoreGame._drop_piece(playField, 0, 0, 1)
     CoreGame._drop_piece(playField, 0, 1, 1)
     CoreGame._drop_piece(playField, 0, 2, 1)
     CoreGame._drop_piece(playField, 0, 3, 1)
     assert CoreGame._winning_move(playField, 1) == True
 
+    # ensures a vertical 4 in a row returns True for winning move
     playField = CoreGame._create_playField(6, 7)
     CoreGame._drop_piece(playField, 0, 0, 1)
     CoreGame._drop_piece(playField, 1, 0, 1)
@@ -117,6 +115,7 @@ def test__winning_move(): #DONE
     CoreGame._drop_piece(playField, 3, 0, 1)
     assert CoreGame._winning_move(playField, 1) == True
 
+    # ensures an upwards vertical 4 in a row returns True for winning move
     playField = CoreGame._create_playField(6, 7)
     CoreGame._drop_piece(playField, 0, 0, 1)
     CoreGame._drop_piece(playField, 1, 1, 1)
@@ -124,6 +123,7 @@ def test__winning_move(): #DONE
     CoreGame._drop_piece(playField, 3, 3, 1)
     assert CoreGame._winning_move(playField, 1) == True
 
+    # ensures a downwards vertical 4 in a row returns True for winning move
     playField = CoreGame._create_playField(6, 7)
     CoreGame._drop_piece(playField, 3, 3, 1)
     CoreGame._drop_piece(playField, 2, 2, 1)
@@ -132,26 +132,8 @@ def test__winning_move(): #DONE
     assert CoreGame._winning_move(playField, 1) == True
 
 
-
-def test_renderer(): #DONE
+def test_renderer():
     playField = CoreGame._create_playField(6, 7)
 
     # this function should always return true unless there is an error
     assert CoreGame.renderer(playField) == True
-
-
-#def test__quit(): #?
-
-
-
-#def test__input(): #?
-
-
-
-#def test__game_loop(): #?
-
-
-
-#def test_start_game(): #?
-
-
