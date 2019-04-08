@@ -8,7 +8,7 @@ from pandas import read_csv
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 
-dataset = read_csv("connect4.csv", delimiter=",") #reads in file. http://archive.ics.uci.edu/ml/datasets/connect-4
+dataset = read_csv("connect4.csv", dtype='str', delimiter=",") #reads in file. http://archive.ics.uci.edu/ml/datasets/connect-4
 
 #selecting data by row numbers, data set has 43 rows. Split it.
 X = dataset.iloc[:,0:42].values 
