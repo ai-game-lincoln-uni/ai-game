@@ -20,6 +20,8 @@ log.debug('\tImported OS')
 import tensorflow as tf
 log.debug('\tImported TensorFlow')			# TensorFlow 1.5
 import keras
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
 log.debug('\tImported Keras')
 import numpy as np
 log.debug('\tImported Numpy')
@@ -29,8 +31,9 @@ log.info('\tImporting Done\n')
 training_input = []
 training_output = []
 model = None
-vgg16_model = None
 new_model = None
+has_model = False
+has_new_model = False
 
 
 def _get_data():
@@ -260,7 +263,8 @@ def _save_model(name):
 
 def _load_model(name):
     try:
-        global model
+        global new_model
+        global has_new_model
 
         log.info('Loading model "{}"'.format(name))
 
@@ -269,6 +273,7 @@ def _load_model(name):
         try:
             new_model = keras.models.load_model(name)
             log.info('\tLoaded model "{}"\n'.format(name))
+            has_new_model = True
             # keras.plot_model(new_model, to_file='Model.png')    # Would be a nice idea
             return True
 
@@ -291,6 +296,84 @@ def _create():
     _add_output_layer(7)
     _compile_model()
     _fit_model(3)
+
+
+def _construct():
+    global model
+    global new_model
+    global has_model
+    global has_new_model
+    global training_input
+
+    _get_data()
+    model = Sequential()  # configure model for train
+    # model.add(Dense(32, activation='relu', input_dim=100, input_shape=(54044, 42,))) #relu activiation layer, better perfomance.
+    # model.add(Dense(32, activation='relu', input_shape=(54044, 42, 100))) #relu activiation layer, better perfomance.
+    model.add(Dense(32, activation='relu', input_shape=(41,)))  # relu activiation layer, better perfomance.
+    model.add(Dropout(0.5))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(6, activation='sigmoid'))  # output layer
+    model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])  # trains it using tensoroflow
+
+    model.fit(training_input, training_output, epochs=20, batch_size=128)  # Trains neural network
+
+    has_model = True
+
+    predict_array = []
+    predict_array.append(training_input[0])
+    predict_array = np.array(predict_array)
+
+    # input("Press enter to continue to prediction on data:\n\t{}\n\tShape: ".format(training_input[0], training_input[0].shape))
+    # input("Press enter to continue to prediction on data:\n\t{}\n\tShape: ".format(training_input, training_input.shape))
+    input("Press enter to continue to prediction on data:\n\t{}\n\tShape: ".format(predict_array, predict_array.shape))
+
+    # print(model.predict_on_batch(training_input))
+    prediction = model.predict_on_batch(predict_array)
+    print("Prediction on data:\n{}".format(predict_array))
+    print(prediction)
+    print('\tPrediction: ', np.argmax(prediction[0]))
+
+
+    input("Press enter to continue")
+
+    _save_model("Model_0")
+    _load_model("Model_0")
+
+    predict_array = []
+    predict_array.append(training_input[105])
+    predict_array = np.array(predict_array)
+    prediction = new_model.predict_on_batch(predict_array)
+    print("Prediction on data:\n{}".format(predict_array))
+    print(prediction)
+    print('\tPrediction from new_model: ', np.argmax(prediction[0]))
+
+
+def _predict(input_data):
+    global model
+    global new_model
+    global has_model
+    global has_new_model
+
+    input_data = np.array(input_data)
+
+    input_array = []
+    input_array.append(input_data)
+    input_array = np.array(input_array)
+
+    if has_new_model:
+        prediction = new_model.predict_on_batch(input_array)    # Because I couldn't get model.predict(...) to work
+    else:
+        if has_model:
+            prediction = model.predict_on_batch(input_array)
+        else:
+            log.error("No model found")
+            return False
+
+    prediction = prediction[0]
+    move = np.argmax(prediction)    # returns location of highest array value
+
+    return move
 
 
 
