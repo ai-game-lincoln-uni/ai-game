@@ -71,8 +71,9 @@ def end_screen(player, turns):
     # Loop to update end screen while in use
     while main:
         for event in pygame.event.get():
-            if event.type != pygame.MOUSEMOTION:
-                log.debug(event)
+            #if event.type != pygame.MOUSEMOTION:
+                # log.debug(event)
+
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
@@ -544,6 +545,7 @@ def _game_loop(playField):
                     renderer(playField)
                     pygame.display.flip()
                     log.debug("Test Mode set to {}".format(TestMode))
+                    start_game()
                 if event.key == pygame.K_d:
                     DataGatherMode = not DataGatherMode
                     log.debug("Data Gather mode set to {}".format(DataGatherMode))
@@ -647,8 +649,8 @@ def main_menu():
     #Loop to update the main menu while it is in use
     while main:
         for event in pygame.event.get():
-            if event.type != pygame.MOUSEMOTION:
-                log.debug(event)
+            #if event.type != pygame.MOUSEMOTION:
+            #    log.debug(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
