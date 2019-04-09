@@ -58,9 +58,7 @@ def _format_array_v2(file):    # This one actually works :)
         return False
 
     raw_data = raw_data.replace("[", "")
-    raw_data = raw_data.replace(" ", "")
-    # raw_data = raw_data.replace("]", "")    # reduces string to essential characters
-    # raw_data = raw_data.replace(",", "")
+    raw_data = raw_data.replace(" ", "")    # reduces string to essential characters
 
     length = len(raw_data)
 
@@ -68,11 +66,9 @@ def _format_array_v2(file):    # This one actually works :)
 
     for i in range(length):
         char = raw_data[i]
-        # if not char == " ":    # If char is .|0|1|2
         if not char == "," and not char == "]":    # If char is .|0|1|2
             str_num += char
 
-        # if char == " " or i == length:    # If reached end of number
         if char == "," or char == "]":    # If reached end of number
             num = float(str_num)
             output.append(num)

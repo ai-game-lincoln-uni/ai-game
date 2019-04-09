@@ -308,8 +308,7 @@ def _construct(use_existing = False):
     if not use_existing:
         _get_data()
         model = Sequential()  # configure model for train
-        # model.add(Dense(32, activation='relu', input_dim=100, input_shape=(54044, 42,))) #relu activiation layer, better perfomance.
-        # model.add(Dense(32, activation='relu', input_shape=(54044, 42, 100))) #relu activiation layer, better perfomance.
+
         model.add(Dense(32, activation='relu', input_shape=(42,)))  # relu activiation layer, better perfomance.
         model.add(Dropout(0.5))
         model.add(Dense(64, activation='relu'))
@@ -343,17 +342,10 @@ def _test():
     predict_array.append(training_input[0])
     predict_array = np.array(predict_array)
 
-    # input("Press enter to continue to prediction on data:\n\t{}\n\tShape: ".format(training_input[0], training_input[0].shape))
-    # input("Press enter to continue to prediction on data:\n\t{}\n\tShape: ".format(training_input, training_input.shape))
-    # input("Press enter to continue to prediction on data:\n\t{}\n\tShape: ".format(predict_array, predict_array.shape))
-
-    # print(model.predict_on_batch(training_input))
     prediction = model.predict_on_batch(predict_array)
     print("Prediction on data:\n{}".format(predict_array))
     print(prediction)
     print('\tPrediction: ', np.argmax(prediction[0]))
-
-    # input("Press enter to continue")
 
     _save_model("Model_0")
     _load_model("Model_0")
@@ -376,15 +368,13 @@ def _predict(input_data):
     global new_model
     global has_model
     global has_new_model
-    global training_input
 
     input_data = np.array(input_data)
 
     input_array = []
     input_array.append(input_data)
     input_array = np.array(input_array)
-    print(input_array.shape)
-    print(training_input[0].shape)
+    # (input_array.shape)
 
     if has_new_model:
         prediction = new_model.predict_on_batch(input_array)    # Because I couldn't get model.predict(...) to work

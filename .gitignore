@@ -64,7 +64,7 @@ Game/.idea/httpRequests
 
 # Android studio 3.1+ serialized cache file
 Game/.idea/caches/build_file_checksums.ser
-*.model
+# *.model
 *.log
 
 Game/.idea/
