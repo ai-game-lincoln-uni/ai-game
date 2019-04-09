@@ -22,7 +22,7 @@ ROW_COUNT = 6
 COLUMN_COUNT = 7
 
 
-AIMode = False
+AIMode = True
 DataGatherMode = False
 GatherMove = False
 TestMode = False
@@ -487,11 +487,13 @@ def _game_loop(playField):
     turn = 1
     while True:
         # BIG SCARY EVENT LOOP!
+
         for event in pygame.event.get():  # poll pygame for events
             if event.type == pygame.QUIT:
                 # Allow game to quit
                 _quit()
             if not TestMode:
+
                 if event.type == pygame.MOUSEMOTION:
                     # User moved the mouse, so move their piece after their cursor for  A E S T H E T I C S
                     pygame.draw.rect(screen, (0, 0, 0), (
@@ -503,9 +505,12 @@ def _game_loop(playField):
                         else:
                             pygame.draw.circle(screen, (255, 201, 23), (posx, 50), int(radius))
                         pygame.display.update()  # refresh the screen
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.MOUSEBUTTONDOWN or turn % 2 == 0 and AIMode:
                     # click = drop piece
-                    col = _input(playField, turn, event.pos)  # determine what column the user clicked above
+                    if turn % 2 == 0 and AIMode:
+                        col = _input(playField, turn, pos=[0, 0])
+                    else:
+                        col = _input(playField, turn, event.pos)  # determine what column the user clicked above
                     if col is not None:  # None = the user didnt click in a valid location, so we ignore it
                         row = _get_next_open_row(playField, col)  # determine what row we should place a piece
                         if row != -1:
