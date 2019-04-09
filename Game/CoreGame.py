@@ -231,7 +231,7 @@ def _get_AI_move(playField):
 
     while not _validate_move(playField, best_move):    # Ensures return value is valid
         moves[best_move] = 0.0
-        if moves == np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]):
+        if np.sum(moves) == 0:
             for i in range(8):
                 if _validate_move(playField, i):    # If AI fails, just uses next available slot
                     return i
