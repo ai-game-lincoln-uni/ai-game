@@ -320,13 +320,20 @@ def _construct():
 
     has_model = True
 
+
+def _test():
+    global model
+    global new_model
+    global training_input
+    global training_output
+
     predict_array = []
     predict_array.append(training_input[0])
     predict_array = np.array(predict_array)
 
     # input("Press enter to continue to prediction on data:\n\t{}\n\tShape: ".format(training_input[0], training_input[0].shape))
     # input("Press enter to continue to prediction on data:\n\t{}\n\tShape: ".format(training_input, training_input.shape))
-    input("Press enter to continue to prediction on data:\n\t{}\n\tShape: ".format(predict_array, predict_array.shape))
+    # input("Press enter to continue to prediction on data:\n\t{}\n\tShape: ".format(predict_array, predict_array.shape))
 
     # print(model.predict_on_batch(training_input))
     prediction = model.predict_on_batch(predict_array)
@@ -334,8 +341,7 @@ def _construct():
     print(prediction)
     print('\tPrediction: ', np.argmax(prediction[0]))
 
-
-    input("Press enter to continue")
+    # input("Press enter to continue")
 
     _save_model("Model_0")
     _load_model("Model_0")
@@ -347,6 +353,10 @@ def _construct():
     print("Prediction on data:\n{}".format(predict_array))
     print(prediction)
     print('\tPrediction from new_model: ', np.argmax(prediction[0]))
+    print(training_output[105])
+    print('\tExpected from new_model: ', np.argmax(training_output[105]))
+    print('\tExpected from new_model: ', np.argmin(prediction[0]))
+
 
 
 def _predict(input_data):
@@ -373,7 +383,7 @@ def _predict(input_data):
     prediction = prediction[0]
     move = np.argmax(prediction)    # returns location of highest array value
 
-    return move
+    return prediction
 
 
 

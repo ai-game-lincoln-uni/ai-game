@@ -13,8 +13,9 @@ with contextlib.redirect_stdout(None):
     import pygame
 from logManager import log
 import os
-import keras
+# import keras
 import random
+import NeuralNetwork as nn
 
 
 ROW_COUNT = 6
@@ -39,7 +40,7 @@ pygame.display.set_caption("Connect 4 AI Game")
 logo_image = pygame.image.load("unnamed.png")
 pygame.display.set_icon(logo_image)
 turn = 0  # Variable to hold turn for UI
-AI = 0    # Variable for NN, set to 0 before loaded
+AI = False    # Variable for NN, set to 0 before loaded
 
 # Text objects
 large_text = pygame.font.Font('freesansbold.ttf', 115)
@@ -213,13 +214,28 @@ def _get_AI_move(playField):
     :return: int of move
     """
 
+    global AI
+
+    if not AI:
+        log.error("No AI found")    # Ensures that an AI exists, does happen earlier as well, just making sure
+        nn._construct()
+        nn._save_model("AI")
+        log.info("AI constructed")
+        AI = True
+
     field = _flatten_field(playField)
-    moves = AI.predict(field)    #Should return array eg: [0.1, 0.1, 0.3, 0.8, 0.4, 0.2, 0.1]
+    moves = nn._predict(field)    # Should return array eg: [0.1, 0.1, 0.3, 0.8, 0.4, 0.2, 0.1]
 
-    best_move = np.argmax(moves)    #Returns location of highest val, only first occurrence
+    best_move = np.argmax(moves)    # Returns location of highest val, only first occurrence
 
-    while not _validate_move(playField, best_move):
+    while not _validate_move(playField, best_move):    # Ensures return value is valid
         moves[best_move] = 0.0
+        if moves == np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]):
+            for i in range(7):
+                if _validate_move(playField, i):    # If AI fails, just uses next available slot
+                    return i
+            log.error("AI failed to return usable value")
+            return False
         best_move = np.argmax(moves)
 
     log.info("AI selected move at {}".format(best_move))
@@ -527,9 +543,12 @@ def _game_loop(playField):
                     log.debug("Data Gather mode set to {}".format(DataGatherMode))
                 if event.key == pygame.K_a:
                     AIMode = not AIMode
-                    if AIMode and AI == 0:
+                    if AIMode and (not AI):
                         try:
-                            AI = keras.models.load_model('AI.model')    # If first time AI toggles, imports the NN
+                            # AI = keras.models.load_model('AI.model')    # If first time AI toggles, imports the NN
+                            nn._construct()
+                            nn._save_model("AI")
+                            AI = True
                             log.info("Neural Network model loaded")
                         except:
                             log.error("Failed to load Neural Network model")
