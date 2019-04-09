@@ -90,13 +90,10 @@ def _get_data():
 def _create_model():
     try:
         global model
-        global vgg16_model
 
         log.info('Creating network model')
 
-        model = keras.models.Sequential()
-        # vgg16_model = VGG16(weights="imagent", include_top="false", input_shape=(1000,41,))
-
+        model = Sequential()
 
         log.info('\tNetwork model created\n')
         return True
@@ -112,13 +109,15 @@ def _add_input_layer():
 
         log.info('Adding input layer')
 
-        # model.add(keras.layers.Flatten(input_shape=(None, 42), output_size=42))
+        # # model.add(keras.layers.Flatten(input_shape=(None, 42), output_size=42))
+        #
+        # # model.add(keras.layers.Flatten)
+        # model.add(keras.layers.Flatten(input_shape=(1000, 41, 1)))
+        # # model.add(keras.layers.Input( shape=(1000, 41, )))
+        # # model.add(keras.layers.Flatten(input_dim=41))
 
-        # model.add(keras.layers.Flatten)
-        model.add(keras.layers.Flatten(input_shape=(1000, 41, 1)))
-        # model.add(keras.layers.Input( shape=(1000, 41, )))
-        # model.add(keras.layers.Flatten(input_dim=41))
-
+        model.add(Dense(32, activation='relu', input_shape=(42,)))  # relu activiation layer, better perfomance.
+        model.add(Dropout(0.5))
 
         log.info('\tInput layer added\n')
         return True
@@ -129,58 +128,69 @@ def _add_input_layer():
 
 
 def _add_hidden_layers(layers, nodes):
-    # try:
+    try:
         global model
 
         log.info('Adding {} hidden layers'.format(layers))
 
+        # for _ in range(layers):
+        #     # model.add(keras.layers.Dense(nodes, activation=tf.nn.relu, output_size=42))
+        #     model.add(keras.layers.Dense(nodes, activation=tf.nn.relu))
+        #     model.add(keras.layers.Dropout(0.01))    # Prevents over-fitting the model while training (memorisation)
+        #     # model.add(keras.layers.Flatten())
+
         for _ in range(layers):
-            # model.add(keras.layers.Dense(nodes, activation=tf.nn.relu, output_size=42))
-            model.add(keras.layers.Dense(nodes, activation=tf.nn.relu))
-            model.add(keras.layers.Dropout(0.01))    # Prevents over-fitting the model while training (memorisation)
-            # model.add(keras.layers.Flatten())
+            model.add(Dense(nodes, activation='relu'))
+            model.add(Dropout(0.5))
 
         log.info('\tHidden layers aadded\n')
         return True
 
-    # except:
+    except:
         log.error('\tUnknown error in NeuralNetwork._add_hidden_layers\n')
         return False
 
 
 def _add_output_layer(size):
-    # try:
-        global model
+    try:
 
         log.info('Adding output layer')
-        print(model.summary())
-        model.add(keras.layers.Flatten())    # todo: Currently cuts off here
-        # todo: Flatten layer expecten min_ndim=3, got ndim=2
+        global model
 
-        # model.add(keras.layers.Dense(size, activation=tf.nn.softmax, output_size=6))
-        model.add(keras.layers.Dense(size, activation=tf.nn.softmax))
-        # todo: ValueError: Error when checking target: expected dense_4 to have shape (1,), but got array with shape (6,)    Sorted?
+        # log.info('Adding output layer')
+        # print(model.summary())
+        # model.add(keras.layers.Flatten())    # todo: Currently cuts off here
+        # # todo: Flatten layer expecten min_ndim=3, got ndim=2
+        #
+        # # model.add(keras.layers.Dense(size, activation=tf.nn.softmax, output_size=6))
+        # model.add(keras.layers.Dense(size, activation=tf.nn.softmax))
+        # # todo: ValueError: Error when checking target: expected dense_4 to have shape (1,), but got array with shape (6,)    Sorted?
 
+
+        model.add(Dense(size, activation='sigmoid'))  # output layer
 
         log.info('\tOutput layer added\n')
         return True
 
-    # except:
+    except:
         log.error('\tUnknown error in NeuralNetwork._add_output_layer\n')
         return False
 
 
 def _compile_model():
+
     try:
+        log.info('Compiling model')
         global model
 
-        log.info('Network compiling')
+        # log.info('Network compiling')
+        #
+        # # model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+        # model.compile(optimizer='adam')
 
-        # model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-        model.compile(optimizer='adam')
+        model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])  # trains it using tensoroflow
 
-
-        log.info('\tNetwork compiled\n')
+        log.info('\tModel compiled\n')
         return True
 
     except:
@@ -189,6 +199,7 @@ def _compile_model():
 
 
 def _fit_model(epochs):
+
     # try:
     #     global model
     #     global training_input
@@ -206,27 +217,37 @@ def _fit_model(epochs):
     #     log.error('\tUnknown error in NeuralNetwork._fit_model\n')
     #     return False
 
-    global model
-    global training_input
-    global training_output
+    # global model
+    # global training_input
+    # global training_output
+    #
+    # # print(model.summary())
+    #
+    # log.info('Fitting model')
+    # model.fit(training_input, training_output, epochs=epochs)    # Not currently working
+    #
+    #
+    # log.info('\tModel fitted\n')
+    try:
+        log.info('Fitting model')
+        global model
+        model.fit(training_input, training_output, epochs=epochs, batch_size=128)  # Trains neural network
 
-    # print(model.summary())
+        log.debug("\tModel fitted\n")
+        return True
+    except:
+        log.error("\tFailed to fit model\n")
 
-    log.info('Fitting model')
-    model.fit(training_input, training_output, epochs=epochs)    # Not currently working
-
-
-    log.info('\tModel fitted\n')
-    return True
+        return False
 
 
 def _evaluate_model():
     try:
+        log.info('Evaluating model')
+
         global model
         global test_input    # Test data doesn't exist, not strictly required
         global test_output    # Unless you want to make 1,000 more data sets
-
-        log.info('Evaluating model')
 
         accuracy = model.evaluate(test_input, test_output)
 
@@ -292,10 +313,10 @@ def _create():
     _get_data()
     _create_model()
     _add_input_layer()
-    _add_hidden_layers(1, 10)
+    _add_hidden_layers(1, 64)
     _add_output_layer(7)
     _compile_model()
-    _fit_model(3)
+    _fit_model(20)
 
 
 def _construct(use_existing = False):
@@ -307,16 +328,13 @@ def _construct(use_existing = False):
 
     if not use_existing:
         _get_data()
-        model = Sequential()  # configure model for train
-
-        model.add(Dense(32, activation='relu', input_shape=(42,)))  # relu activiation layer, better perfomance.
-        model.add(Dropout(0.5))
-        model.add(Dense(64, activation='relu'))
-        model.add(Dropout(0.5))
-        model.add(Dense(7, activation='sigmoid'))  # output layer
-        model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])  # trains it using tensoroflow
-
-        model.fit(training_input, training_output, epochs=20, batch_size=128)  # Trains neural network
+        _create_model()
+        _add_input_layer()
+        _add_hidden_layers(1, 64)
+        _add_output_layer(7)
+        _compile_model()
+        # print(model.summary())
+        _fit_model(20)
 
         _save_model("AI")
 
@@ -404,7 +422,7 @@ if __name__ == "__main__":
     _add_output_layer(7)
     _compile_model()
     print(model.summary())
-    _fit_model(3)
+    _fit_model(20)
 
 
     # log.info('Training_Input data:\t{} '.format(training_input[5]))
