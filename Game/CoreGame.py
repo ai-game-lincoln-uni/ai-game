@@ -218,20 +218,21 @@ def _get_AI_move(playField):
 
     if not AI:
         log.error("No AI found")    # Ensures that an AI exists, does happen earlier as well, just making sure
-        nn._construct()
+        nn._construct("AI")
         nn._save_model("AI")
         log.info("AI constructed")
         AI = True
 
     field = _flatten_field(playField)
+    print(np.array(field).shape)
     moves = nn._predict(field)    # Should return array eg: [0.1, 0.1, 0.3, 0.8, 0.4, 0.2, 0.1]
 
     best_move = np.argmax(moves)    # Returns location of highest val, only first occurrence
 
     while not _validate_move(playField, best_move):    # Ensures return value is valid
         moves[best_move] = 0.0
-        if moves == np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]):
-            for i in range(7):
+        if moves == np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]):
+            for i in range(8):
                 if _validate_move(playField, i):    # If AI fails, just uses next available slot
                     return i
             log.error("AI failed to return usable value")
@@ -546,8 +547,8 @@ def _game_loop(playField):
                     if AIMode and (not AI):
                         try:
                             # AI = keras.models.load_model('AI.model')    # If first time AI toggles, imports the NN
-                            nn._construct()
-                            nn._save_model("AI")
+                            nn._construct("AI")
+                            # nn._save_model("AI")
                             AI = True
                             log.info("Neural Network model loaded")
                         except:

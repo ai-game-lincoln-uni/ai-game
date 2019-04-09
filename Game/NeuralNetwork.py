@@ -298,27 +298,39 @@ def _create():
     _fit_model(3)
 
 
-def _construct():
+def _construct(use_existing = False):
     global model
     global new_model
     global has_model
     global has_new_model
     global training_input
 
-    _get_data()
-    model = Sequential()  # configure model for train
-    # model.add(Dense(32, activation='relu', input_dim=100, input_shape=(54044, 42,))) #relu activiation layer, better perfomance.
-    # model.add(Dense(32, activation='relu', input_shape=(54044, 42, 100))) #relu activiation layer, better perfomance.
-    model.add(Dense(32, activation='relu', input_shape=(41,)))  # relu activiation layer, better perfomance.
-    model.add(Dropout(0.5))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(6, activation='sigmoid'))  # output layer
-    model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])  # trains it using tensoroflow
+    if not use_existing:
+        _get_data()
+        model = Sequential()  # configure model for train
+        # model.add(Dense(32, activation='relu', input_dim=100, input_shape=(54044, 42,))) #relu activiation layer, better perfomance.
+        # model.add(Dense(32, activation='relu', input_shape=(54044, 42, 100))) #relu activiation layer, better perfomance.
+        model.add(Dense(32, activation='relu', input_shape=(42,)))  # relu activiation layer, better perfomance.
+        model.add(Dropout(0.5))
+        model.add(Dense(64, activation='relu'))
+        model.add(Dropout(0.5))
+        model.add(Dense(7, activation='sigmoid'))  # output layer
+        model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])  # trains it using tensoroflow
 
-    model.fit(training_input, training_output, epochs=20, batch_size=128)  # Trains neural network
+        model.fit(training_input, training_output, epochs=20, batch_size=128)  # Trains neural network
 
-    has_model = True
+        _save_model("AI")
+
+        has_model = True
+
+        return True
+
+    else:
+        try:
+            _load_model(use_existing)
+        except:
+            _construct(False)
+        return True
 
 
 def _test():
@@ -364,12 +376,15 @@ def _predict(input_data):
     global new_model
     global has_model
     global has_new_model
+    global training_input
 
     input_data = np.array(input_data)
 
     input_array = []
     input_array.append(input_data)
     input_array = np.array(input_array)
+    print(input_array.shape)
+    print(training_input[0].shape)
 
     if has_new_model:
         prediction = new_model.predict_on_batch(input_array)    # Because I couldn't get model.predict(...) to work
