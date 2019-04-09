@@ -26,6 +26,7 @@ AIMode = True
 DataGatherMode = False
 GatherMove = False
 TestMode = False
+hueHSV = 0
 
 log.debug("AI mode set to {}".format(AIMode))
 log.debug("Data Gather mode set to {}".format(DataGatherMode))
@@ -349,6 +350,35 @@ def _winning_move(playField, player):
     return False
 
 
+def hsv_to_rgb(h, s=1, v=1):
+    # SOURCE: http://code.activestate.com/recipes/576919-python-rgb-and-hsv-conversion/
+    h = float(h)
+    s = float(s)
+    v = float(v)
+    h60 = h / 60.0
+    h60f = math.floor(h60)
+    hi = int(h60f) % 6
+    f = h60 - h60f
+    p = v * (1 - s)
+    q = v * (1 - f * s)
+    t = v * (1 - (1 - f) * s)
+    r, g, b = 0, 0, 0
+    if hi == 0:
+        r, g, b = v, t, p
+    elif hi == 1:
+        r, g, b = q, v, p
+    elif hi == 2:
+        r, g, b = p, v, t
+    elif hi == 3:
+        r, g, b = p, q, v
+    elif hi == 4:
+        r, g, b = t, p, v
+    elif hi == 5:
+        r, g, b = v, p, q
+    r, g, b = int(r * 255), int(g * 255), int(b * 255)
+    return r, g, b
+
+
 def renderer(playField):
     """
     Inverts and prints out the play field
@@ -356,6 +386,7 @@ def renderer(playField):
     :param playField: The play field
     :return: None
     """
+    global hueHSV
     screen.fill((0, 0, 0))
     try:
         playField = np.flip(playField, 0)
@@ -365,7 +396,10 @@ def renderer(playField):
                 if not TestMode:
                     pygame.draw.rect(screen, (0, 89, 179), ((col*100), (row*100)+100, 100, 100))
                 else:
-                    pygame.draw.rect(screen, (210, 0, 252), ((col * 100), (row * 100) + 100, 100, 100))
+                    RGB = hsv_to_rgb(hueHSV, 1, 1)
+                    if hueHSV == 361:
+                        hueHSV = 0
+                    pygame.draw.rect(screen, RGB, ((col * 100), (row * 100) + 100, 100, 100))
         for col in range(COLUMN_COUNT):
             for row in range(ROW_COUNT):
                 if playField[row][col] == 0:
@@ -483,6 +517,7 @@ def _game_loop(playField):
     global AIMode
     global AI
     global turn
+    global hueHSV
 
     log.info("Game Loop started")
     turn = 1
@@ -572,6 +607,7 @@ def _game_loop(playField):
                     if _winning_move(playField, turn % 2 + 1):  # check if a player has won
                         log.info("Win condition met for player {}".format(turn % 2 + 1))
                         renderer(playField)
+                        hueHSV = hueHSV + 1
                         pygame.display.update()
                         print("Player {} is the Winner in {} turns!".format(turn % 2 + 1, turn))
                         pygame.time.wait(10)
